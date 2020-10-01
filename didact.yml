@@ -1,13 +1,13 @@
 # Settings you need to set
-hostname: yujiri.xyz
+hostname: mysite.com
 # The title to display
-site_title: Yujiri
+site_title: My Site
 # The From address used in notification emails and such.
-server_email: "notifications@yujiri.xyz"
+server_email: "notifications@mysite.com"
 # The sender name that'll be displayed more prominently in most email clients.
-server_email_name: "yujiri.xyz notifications"
+server_email_name: "My Site"
 # Your email address, so Didact can alert you when there's an error.
-admin_email: "rlwestlund@gmail.com"
+admin_email: "admin@mysite.com"
 
 # Settings you don't need to set.
 # Filepath to the site's icon, which will be displayed on the tab or bookmark in browsers.
