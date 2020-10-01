@@ -1,6 +1,6 @@
 TITLE It's a Cat!
 
-![cat image](cat.png)
+![cat image](cat.jpg)
 
 Oh look! It's a cute cat!
 
