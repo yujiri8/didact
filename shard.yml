@@ -1,0 +1,16 @@
+name: didact
+version: 0.0.0
+
+authors:
+  - Yujiri <yujiri@protonmail.com>
+
+dependencies:
+  granite:
+    github: amberframework/granite
+  pg:
+    github: will/crystal-pg
+  kemal:
+    github: kemalcr/kemal
+    commit: a8c0f09b858162bd13c96663febef5527b322a32
+  sanemark:
+    github: yujiri8/sanemark-crystal

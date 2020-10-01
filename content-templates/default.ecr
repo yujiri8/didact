@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="initial-scale=1">
+<%- if CFG.icon != "" -%>
+	<link rel="icon" type="image/png" href="/<%= CFG.icon %>">
+<%- end -%>
+<%- if args["DESC"]? -%>
+	<meta name="description" content="<%= args["DESC"] %>">
+	<meta property="og:description" content="<%= args["DESC"] %>">
+<%- end -%>
+
+<%- if args["NOINDEX"]? -%>
+	<meta name="robots" content="noindex">
+<%- else -%>
+	<link rel="canonical" href="https://<%= CFG.hostname %>/<%= args["PATH"] %>">
+<%- end -%>
+<%- if args["PREVIEW_IMAGE"]? -%>
+	<meta property="og:image" content="<%= args["PREVIEW_IMAGE"] %>">
+	<meta property="og:title" content="<%= args["TITLE"] %>">
+	<meta property="og:url" content="https://<%= CFG.hostname %>/<%= args["PATH"] %>">
+	<meta property="og:type" content="website">
+<%- end -%>
+<%- if args["TWITTER"]? -%>
+	<meta name="twitter:creator" content="<%= args["TWITTER"] %>">
+<%- end -%>
+
+<%- args["CSS"].as(Array).+(["/global.css"]).each do |stylesheet| -%>
+	<link rel="stylesheet" href="<%= stylesheet %>">
+<%- end -%>
+<%- args["JS"].as(Array).+(["/global.js"]).each do |script| -%>
+	<script src="<%= script %>"></script>
+<%- end -%>
+<title><%= args["TITLE"] %></title>
+</head>
+<body onload="<%= args["ONLOAD"]? %>" onresize="<%= args["ONRESIZE"]? %>">
+
+<div class="navbar">
+	<div style="flex:1"></div>
+	<nav><%= args["NAV"].as(String) %></nav>
+	<div style="flex:1; display:flex; justify-content:flex-end">
+		<theme-switch></theme-switch>
+	</div>
+</div>
+
+<noscript>
+<small><i>Some of this site's features don't work without Javascript (dark mode, comments, etc).</i></small>
+<br>
+</noscript>
+
+<article><%= args["BODY"] %></article>
+
+<%- if !args["NO_TIMESTAMP"]? || !args["NO_COMMENTS"]? -%>
+<br><hr>
+<div style="margin: var(--outer-margins)">
+	<%- if !args["NO_TIMESTAMP"]? -%>
+		<p>This page was last modified <time id="timestamp"
+				datetime="<%= args["TIMESTAMP"].as(Time).to_rfc3339 %>">
+			<%= args["TIMESTAMP"].as(Time).to_s "%Y-%m-%d %R" %></time> (UTC)
+		</p>
+	<%- end -%>
+	<%- if !args["NO_COMMENTS"]? -%>
+		<comment-section id="comment-section"></comment-section>
+	<%- end -%>
+</div>
+<%- end -%>
+
+<auth-popup id="authenticator"></auth-popup>
+</body>
+</html>

@@ -1,0 +1,14 @@
+Error at <%= CFG.hostname %>, at <%= Time.utc.to_s "%Y-%m-%d, %A, %R" %>
+
+Request:
+<%= env.request.method %> <%= env.request.path %><%= env.request.query %>
+<% env.request.headers.each do |header, values| -%>
+	<%- values.each do |value| -%>
+		<%-= header %>: <%= value %>
+	<%- end -%>
+<%- end -%>
+
+<%= env.request.body.try &.gets_to_end %>
+
+Error:
+<%= exc.inspect_with_backtrace %>

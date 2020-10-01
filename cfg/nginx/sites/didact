@@ -1,0 +1,13 @@
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+	server_name <%= CFG.hostname %>;
+	root <%= File.expand_path("#{__DIR__}/../../../html") %>;
+	index index;
+	error_page 404 /404;
+	try_files $uri $uri/ =404;
+	location /api/ {
+		proxy_pass http://localhost:3000/;
+		proxy_set_header X-Forwarded-For $remote_addr;
+	}
+}

@@ -1,0 +1,23 @@
+# Settings you need to set
+hostname: yujiri.xyz
+# The title to display
+site_title: Yujiri
+# The From address used in notification emails and such.
+server_email: "notifications@yujiri.xyz"
+# The sender name that'll be displayed more prominently in most email clients.
+server_email_name: "yujiri.xyz notifications"
+# Your email address, so Didact can alert you when there's an error.
+admin_email: "rlwestlund@gmail.com"
+
+# Settings you don't need to set.
+# Filepath to the site's icon, which will be displayed on the tab or bookmark in browsers.
+# icon: ""
+# preview_image and twitter are used to generate the
+# link previews used on some social media sites.
+# preview_image: "" # should be a full URL
+# twitter: "@username"
+cookie_lifetime: 2592000 # In seconds. This is a month.
+# Settings to connect to PostgreSQL.
+postgres:
+  db: didact
+  user: didact

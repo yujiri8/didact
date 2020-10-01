@@ -1,0 +1,123 @@
+/* color scheme */
+:root {
+	--outer-margins: 1em;
+	--bgcolor: white;
+	--textcolor: black;
+	--weakcolor: grey; /* used for borders and shadows */
+	--buttonbgcolor: #eee;
+	--tintcolor: #eee;
+	--linkcolor: #00e;
+	--linkvisitedcolor: #50a;
+	--yellowcolor: #aa0; /* yellow needs to be darker on a white background to look good */
+	--notecolor: #090;
+}
+/* color changes for dark mode */
+:root[data-theme="dark"] {
+	--bgcolor: #080808;
+	--textcolor: white;
+	--weakcolor: grey;
+	--buttonbgcolor: #ddd;
+	--tintcolor: #282828;
+	--linkcolor: #07f;
+	--linkvisitedcolor: #b0f;
+	--yellowcolor: #ff0;
+	--notecolor: #9f9;
+}
+
+body {
+	font-family: system-ui, sans-serif;
+	margin: 0; /* Remove UA edge spacing */
+	padding-bottom: 3em;
+	background-color: var(--bgcolor);
+	color: var(--textcolor);
+}
+article {
+	margin: var(--outer-margins);
+	margin-top: calc(var(--outer-margins) + 1em);
+}
+* { box-sizing: border-box }
+
+.navbar {
+	position: sticky;
+	top: 0;
+	width: 100%;
+	padding: 0.3em;
+	background-color: grey;
+	color: white;
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	align-items: center;
+}
+nav {
+	font-size: 1.25em;
+	text-align: center;
+}
+
+/* Everything after this point will be copied to css.js - see the copycss.cr pre-build script. */
+
+a { color: var(--linkcolor) }
+a:visited {	color: var(--linkvisitedcolor) }
+/* links that are part of the user interface get a special color */
+a.ui-link, a.ui-link:visited { color: yellow }
+code, pre {
+	/* this 'monospace, monospace' hack works around dumb behavior of browsers: http://code.iamkate.com/html-and-css/fixing-browsers-broken-monospace-font-handling/ */
+	font-family: monospace, monospace;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+code { background-color: var(--tintcolor) }
+pre > code { display: block }
+.highlight { background-color: #ff06 }
+.note:before { content: '[' }
+.note:after { content: ']' }
+.note { color: var(--notecolor) }
+.spoiler, .spoiler * { background-color: var(--textcolor) }
+.spoiler:hover { color: var(--bgcolor) }
+/* this is necessary to stop links from showing through */
+.spoiler:not(:hover) * { color: var(--textcolor) }
+hr { border-color: var(--weakcolor) }
+.indent { margin-left: 1em }
+summary { cursor: pointer }
+details { margin-bottom: 1em }
+blockquote {
+	border-left: 6px solid #00ffff;
+	margin: 0.5em 1em 0.5em 1em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}
+/* tables */
+table {	width: 100% }
+th.par, td.par { /* paragraph columns in tables */
+	min-width: 30em;
+}
+table, th, td {
+	border: 1px solid var(--weakcolor);
+	border-collapse: collapse;
+	text-align: center;
+}
+tbody.checkered tr:nth-child(odd) {
+	background-color: var(--tintcolor);
+}
+/* section links */
+a.sectionlink, a.sectionlink:visited {
+	color: inherit;
+	text-decoration: inherit;
+}
+/* stop the navbar from covering document fragments: https://yujiri.xyz/software/headinglinks */
+:target::before {
+	content: "";
+	display: block;
+	height: 5rem;
+	margin-top: -5rem;
+}
+/* Stop things from overflowing horizontally */
+pre { overflow-x: auto }
+img { max-width: 100% }
+
+/* Middle finger to you browsers. I will not let you mutilate my h1s into h2s inside <article>. */
+h1 {
+	font-size: 2em;
+	margin-block-start: 0.67em;
+	margin-block-end: 0.67em;
+}

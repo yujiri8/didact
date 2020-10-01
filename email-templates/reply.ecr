@@ -1,0 +1,13 @@
+A reply has been posted to a comment thread you're subscribed to.
+
+On <%= comment.time_added.to_s "%Y-%m-%d %R" %>, <%= comment.name %> posted on <%= comment.article_title %>:
+
+<%= comment.body %>
+
+-----
+
+Direct link to the comment: https://<%= CFG.hostname %>/<%= comment.article_path %>?c=<%= comment.id %>
+
+To edit your subscriptions, visit https://<%= CFG.hostname %>/account.
+
+Don't reply by email. That doesn't work.

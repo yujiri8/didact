@@ -1,0 +1,9 @@
+lib
+node_modules
+docs
+content
+html
+didact-server
+didact-template
+src/scripts/templates.cr
+js/css.js

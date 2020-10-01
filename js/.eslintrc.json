@@ -1,0 +1,23 @@
+{
+    "env": {
+        "browser": true,
+        "es2020": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 11,
+        "sourceType": "module"
+    },
+    "plugins": [
+    	"only-warn"
+   	],
+    "rules": {
+        "linebreak-style": [
+            "warn",
+            "unix"
+        ],
+        "no-constant-condition": [
+        	"off"
+        ]
+    }
+}
