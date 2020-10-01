@@ -23,5 +23,5 @@ CFG = begin
   Cfg.from_yaml(File.open "didact.yml")
 rescue err
   STDERR.puts "Your didact.yml is invalid: #{err}"
-  raise err
+  exit 1
 end
