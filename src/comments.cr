@@ -35,20 +35,18 @@ post "/comments" do |env|
       ua: env.request.headers["user-agent"]?,
       time_added: Time.utc,
     )
-    # Fill in article_path from parent comment if this isn't top-level.
-    cmt.article_path = cmt.parent.not_nil!.article_path if cmt.article_path == ""
   rescue err
-    puts err
     halt env, 400
   end
   cmt.validate
-  # TODO Fill in the article title.
-  if cmt.article_path
-  end
-  # Replies inherit their article path from their reply_to.
+  # Replies inherit their article path and title from their reply_to.
   if cmt.reply_to
     parent = Comment.find!(cmt.reply_to)
     cmt.article_path = parent.article_path
+    cmt.article_title = parent.article_title
+  else
+    # For a top-level comment, we ned to fetch the article title.
+    cmt.article_title = Util.get_article_title(cmt.article_path) || raise UserErr.new 400
   end
   # Make sure they aren't impersonating a registered user.
   # If it's not a logged in user, check for an email.
@@ -62,7 +60,6 @@ post "/comments" do |env|
     end
   end
   cmt.user_id = env.user.try &.id
-  cmt.article_title = cmt.article_path
   cmt.save!
   # Subscribe the user who posted it.
   if env.user.try &.autosub

@@ -41,7 +41,7 @@ class Comment < Granite::Base
       "id"            => @id,
       "name"          => @name,
       "article_title" => @article_title,
-      "article_path"  => @article_path,
+      "link"          => "#{@article_path}?c=#{@id}#comment-section",
       "time_added"    => @time_added,
     }
   end

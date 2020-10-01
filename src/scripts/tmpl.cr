@@ -8,7 +8,7 @@ require "../cfg"
 require "./templates"
 
 CONTENT_DIR = Path.new(__DIR__ + "/../../content").expand.to_s
-DEPLOY_DIR = Path.new(__DIR__ + "/../../html").expand.to_s
+DEPLOY_DIR  = Path.new(__DIR__ + "/../../html").expand.to_s
 
 # Reads the specified file, determines the appropriate correspondent in the deploy folder, and creates it.
 def process_file(filename)

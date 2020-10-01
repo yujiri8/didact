@@ -9,10 +9,11 @@ module Util
 
   # Gets the title of an article from its path.
   def get_article_title(path : String)
+    path = "#{__DIR__}/../content#{path}"
     path += "index" if path.ends_with?("/")
-    if File.exists?("#{__DIR__}/../content#{path}.md")
+    if File.exists?("#{path}.md")
       path += ".md"
-    elsif File.exists?("#{__DIR__}/../content#{path}.html")
+    elsif File.exists?("#{path}.html")
       path += ".html"
     end
     File.read_lines(path).each do |line|
