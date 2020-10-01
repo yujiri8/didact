@@ -121,3 +121,26 @@ h1 {
 	margin-block-start: 0.67em;
 	margin-block-end: 0.67em;
 }
+
+input, textarea {
+	color: var(--textcolor);
+	background-color: var(--bgcolor);
+	border: 1px solid var(--weakcolor);
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+/* these don't inherit font stuff by default */
+input, textarea, button {
+	font-family: inherit;
+	font-size: 0.9em;
+}
+textarea {
+	max-width: 100%;
+	width: 60em;
+	min-height: 8em;
+}
+button {
+	cursor: pointer;
+	border-radius: 5px;
+	background-color: var(--buttonbgcolor);
+}
