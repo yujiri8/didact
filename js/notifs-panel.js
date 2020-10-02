@@ -13,6 +13,7 @@ customElements.define('notifs-panel', class extends LitElement {
 			articleSubs: {type: Array, attribute: false},
 			autosub: {type: Boolean, attribute: false},
 			subSite: {type: Boolean, attribute: false},
+			disableReset: {type: Boolean, attribute: false},
 		}
 	}
 	static get styles() {
@@ -60,17 +61,6 @@ customElements.define('notifs-panel', class extends LitElement {
 				<button @click="${this.setName}">submit</button>
 			</fieldset>
 		`:''}
-		<br>
-		<fieldset>
-			<p>
-			You can upload a PGP public key. If you do, reset emails will be encrypted,
-			you'll be able to exclude others from commenting as your name, and you'll
-			be able to edit your comments.
-			</p>
-			${this.key? html`<p>Your current key's fingerprint is ${this.key}.</p>` : ''}
-			<input type="file" id="key" name="key">
-			<button @click="${this.setKey}">submit</button>
-		</fieldset>
 		<p>
 		Normally, you get notifications for replies to any comment you're subscribed
 		to or are subscribed to a parent of. Setting a comment to "ignore" will prevent
@@ -82,6 +72,9 @@ customElements.define('notifs-panel', class extends LitElement {
 		<br>
 		<input id="sub-site" type="checkbox" ?checked="${this.subSite}" @change="${this.setSubSite}"></input>
 		<label for="sub-site">Be notified when new articles are posted</label>
+		<br>
+		<input id="disable-reset" type="checkbox" ?checked="${this.disableReset}" @change="${this.setDisableReset}"></input>
+		<label for="disable-reset">Disable password reset emails (a security feature)</label>
 		<h3>Subscriptions</h3>
 		<table>
 			<thead><tr>
@@ -134,6 +127,7 @@ customElements.define('notifs-panel', class extends LitElement {
 		this.articleSubs = data.article_subs;
 		this.autosub = data.autosub;
 		this.subSite = data.site;
+		this.disableReset = data.disable_reset;
 	}
 	async setPw() {
 		const pwBox = this.shadowRoot.getElementById('pw');
@@ -159,6 +153,10 @@ customElements.define('notifs-panel', class extends LitElement {
 	}
 	async setSubSite(e) {
 		await util.api('PUT', 'users/subsite', undefined, e.target.checked);
+		util.showToast('success', "Setting saved");
+	}
+	async setDisableReset(e) {
+		await util.api('PUT', 'users/disablereset', undefined, e.target.checked);
 		util.showToast('success', "Setting saved");
 	}
 	async editCommentSub(id, state) {

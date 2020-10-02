@@ -62,9 +62,7 @@ post "/comments" do |env|
   cmt.user_id = env.user.try &.id
   cmt.save!
   # Subscribe the user who posted it.
-  if env.user.try &.autosub
-    Subscription.create! user_id: env.user.not_nil!.id, comment_id: cmt.id
-  end
+  Subscription.create! user_id: env.user.not_nil!.id, comment_id: cmt.id if env.user.try &.autosub
   spawn { send_reply_notifs cmt }
 end
 

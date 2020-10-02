@@ -63,9 +63,9 @@ class User < Granite::Base
   column id : Int64, primary: true
   column email : String, unique: true
   column name : String?, unique: true
-  column pgp : String?
-  column pw : String?
   column auth : String
+  column pw : String?
+  column disable_reset : Bool = false
   column admin : Bool = false
   column autosub : Bool = true
   column sub_site : Bool = false

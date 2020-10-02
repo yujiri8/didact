@@ -54,7 +54,6 @@ customElements.define('a-comment', class extends LitElement {
 	constructor() {
 		super();
 		this.loggedIn = util.readCookie('auth') && util.readCookie('email');
-		this.key = util.readCookie('key');
 		this.admin = util.readCookie('admin');
 		this.replies = [];
 	}
@@ -129,7 +128,7 @@ customElements.define('a-comment', class extends LitElement {
 			<button @click="${() => this.setNotifs(true)}">Subscribe</button>
 			<button @click="${() => this.setNotifs(null)}">Unignore</button>
 		`:''}
-		${this.admin || this.key && this.comment.owned? html`
+		${this.admin || this.comment.owned? html`
 			${this.editMode? html`
 				<button @click="${this.finishEdit}">Save</button>
 			`:html`

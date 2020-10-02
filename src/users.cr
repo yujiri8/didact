@@ -43,7 +43,10 @@ def register_email(email : String)
   raise UserErr.new(400, "That doesn't look like a valid email address") if !/[^@]+@[\w]+\.[\w]+/.match(email)
   user = User.find_by(email: email)
   if user
-    # They're asking to claim a registered email; just send the confirmation.
+    # They're asking to claim a registered email. Inform them if the user has disabled password reset.
+    raise UserErr.new(403, "That email belongs to a registered user, who has disabled password reset.") \
+       if user.disable_reset
+    # just send the confirmation.
     send_confirm_email(user)
     return user
   end
@@ -73,10 +76,11 @@ end
 get "/users/notifs" do |env|
   halt env, 401 if !env.user
   next {
-    "comment_subs": env.user.not_nil!.comment_subs.map &.dict,
-    "article_subs": env.user.not_nil!.article_subs.map &.dict,
-    "autosub":      env.user.not_nil!.autosub,
-    "site":         env.user.not_nil!.sub_site,
+    "comment_subs":  env.user.not_nil!.comment_subs.map &.dict,
+    "article_subs":  env.user.not_nil!.article_subs.map &.dict,
+    "autosub":       env.user.not_nil!.autosub,
+    "disable_reset": env.user.not_nil!.disable_reset,
+    "site":          env.user.not_nil!.sub_site,
   }.to_json
 end
 
@@ -144,10 +148,20 @@ put "/users/autosub" do |env|
   halt env, 401 if !env.user
   begin
     autosub = JSON.parse(env.request.body.not_nil!).as_bool
-    # autosub = env.params.json["autosub"].as(Bool)
   rescue
     raise UserErr.new 400
   end
   env.user.not_nil!.autosub = autosub
+  env.user.not_nil!.save!
+end
+
+put "/users/disablereset" do |env|
+  halt env, 401 if !env.user
+  begin
+    disable_reset = JSON.parse(env.request.body.not_nil!).as_bool
+  rescue
+    raise UserErr.new 400
+  end
+  env.user.not_nil!.disable_reset = disable_reset
   env.user.not_nil!.save!
 end

@@ -18,11 +18,11 @@ def createdb(dbname)
       email text NOT NULL,
       auth text NOT NULL,
       pw text,
-      pgp text,
       name text,
-      admin boolean,
-      autosub boolean,
-      sub_site boolean
+      admin boolean NOT NULL,
+      autosub boolean NOT NULL,
+      disable_reset boolean NOT NULL,
+      sub_site boolean NOT NULL
     )"
     db.exec "CREATE TABLE comments (
       id BIGSERIAL PRIMARY KEY,
