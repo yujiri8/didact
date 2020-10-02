@@ -35,7 +35,6 @@ article {
 	margin: var(--outer-margins);
 	margin-top: calc(var(--outer-margins) + 1em);
 }
-* { box-sizing: border-box }
 
 .navbar {
 	position: sticky;
@@ -56,6 +55,7 @@ nav {
 
 /* Everything after this point will be copied to css.js - see the copycss.cr pre-build script. */
 
+* { box-sizing: border-box }
 a { color: var(--linkcolor) }
 a:visited {	color: var(--linkvisitedcolor) }
 /* links that are part of the user interface get a special color */
