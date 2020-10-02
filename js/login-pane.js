@@ -1,7 +1,7 @@
 import {LitElement, html, css} from 'lit-element';
 
 import {styles} from './css.js';
-import {readCookie, setCookie, login, api, showToast} from './util.js';
+import * as util from './util.js';
 
 customElements.define('login-pane', class extends LitElement {
 	static get properties() {
@@ -23,8 +23,8 @@ customElements.define('login-pane', class extends LitElement {
 	}
 	constructor() {
 		super();
-		this.user = readCookie('email');
-		this.loggedIn = readCookie('auth');
+		this.user = util.readCookie('email');
+		this.loggedIn = util.readCookie('auth');
 	}
 	render() {
 		return this.user && this.loggedIn ? html`
@@ -45,7 +45,7 @@ customElements.define('login-pane', class extends LitElement {
 		`;
 	}
 	async login() {
-		await login();
+		await util.login();
 		location.reload();
 	}
 	logout() {
@@ -56,8 +56,8 @@ customElements.define('login-pane', class extends LitElement {
 	}
 	async signup() {
 		const email = this.shadowRoot.getElementById('email').value;
-		setCookie('email', email);
-		await api('POST', 'users/claim', undefined, {email: email});
-		showToast('success', "Confirmation email sent.");
+		util.setCookie('email', email);
+		await util.api('POST', 'users/claim', undefined, {email: email});
+		util.showToast('success', "Confirmation email sent.");
 	}
 });
