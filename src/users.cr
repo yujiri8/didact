@@ -115,7 +115,7 @@ put "/users/notifs" do |env|
     # Delete any existing subscription to avoid duplicates.
     sub = ArticleSubscription.find_by(user_id: env.user.not_nil!.id, path: path)
     sub.destroy! if sub
-    ArticleSubscription.create!(user_id: env.user.not_nil!.id, path: path) if state
+    ArticleSubscription.create!(user_id: env.user.not_nil!.id, path: path, title: title) if state
   end
 end
 
