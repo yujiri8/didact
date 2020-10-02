@@ -92,18 +92,18 @@ delete "/comments/:id" do |env|
 end
 
 def send_reply_notifs(new_comment : Comment)
-  listening = Set.new [] of User
-  ignoring = Set.new [] of User
+  listening = Set.new [] of String
+  ignoring = Set.new [] of String
   # Never notify people about their own comment.
-  ignoring.add new_comment.user if new_comment.user
+  ignoring.add new_comment.user.email if new_comment.user_id
   # Travel up the tree, finding the lowest-level subscription or ignore for each user.
   comment = new_comment
   while true
     comment.subs.each do |sub|
       # If it's a sub and not overridden by a more specific ignore.
-      listening.add(sub.user) if sub.sub && !ignoring.includes?(sub.user)
+      listening.add(sub.user.email) if sub.sub && !ignoring.includes?(sub.user.email)
       # if it's an ignore and not overridden by a more specific sub.
-      ignoring.add(sub.user) if sub.sub && !listening.includes?(sub.user)
+      ignoring.add(sub.user.email) if !sub.sub && !listening.includes?(sub.user.email)
     end
     # If we're not at the top level, go on with the parent.
     if comment.reply_to
@@ -111,14 +111,14 @@ def send_reply_notifs(new_comment : Comment)
     else
       # If we're at the top level, do article subs.
       ArticleSubscription.where(path: comment.article_path).each do |sub|
-        listening.add(sub.user) if !ignoring.includes?(sub.user)
+        listening.add(sub.user.email) if !ignoring.includes?(sub.user.email)
       end
       break
     end
   end
   # Email everbody.
   listening.each do |user|
-    Emails.send(CFG.server_email, CFG.server_email_name, [user.email],
+    Emails.send(CFG.server_email, CFG.server_email_name, [user],
       "New reply on #{CFG.site_title}", Emails.reply_notif(new_comment))
   end
 end

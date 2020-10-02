@@ -6,7 +6,7 @@ On <%= comment.time_added.to_s "%Y-%m-%d %R" %>, <%= comment.name %> posted on <
 
 -----
 
-Direct link to the comment: https://<%= CFG.hostname %>/<%= comment.article_path %>?c=<%= comment.id %>
+Direct link to the comment: https://<%= CFG.hostname %><%= comment.article_path %>?c=<%= comment.id %>#comment-section
 
 To edit your subscriptions, visit https://<%= CFG.hostname %>/account.
 

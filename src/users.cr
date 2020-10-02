@@ -102,7 +102,7 @@ put "/users/notifs" do |env|
     sub = Subscription.find_by(user_id: env.user.not_nil!.id, comment_id: id)
     sub.destroy! if sub
     if !state.nil?
-      Subscription.create!(user_id: env.user.not_nil!.id, comment_id: id, state: state)
+      Subscription.create!(user_id: env.user.not_nil!.id, comment_id: id, sub: state)
     end
     # Article subscription.
   elsif path
