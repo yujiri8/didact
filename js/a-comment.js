@@ -146,8 +146,8 @@ customElements.define('a-comment', class extends LitElement {
 		this.requestUpdate();
 	}
 	async edit() {
-		const comment = await util.api('GET', 'comments', {id: this.comment.id, raw: true});
-		this.comment.body = comment.body;
+		const resp = await util.api('GET', 'comments', {id: this.comment.id, raw: true});
+		this.comment.body = resp.comments[0].body;
 		this.editMode = true;
 	}
 	async finishEdit() {
@@ -158,7 +158,7 @@ customElements.define('a-comment', class extends LitElement {
 		});
 		this.editMode = false;
 		// Re-fetch it.
-		this.comment = await util.api('GET', 'comments', {id: this.comment.id});
+		this.comment = (await util.api('GET', 'comments', {id: this.comment.id})).comments[0];
 	}
 	async delete() {
 		await util.api('DELETE', 'comments', undefined, this.comment.id);

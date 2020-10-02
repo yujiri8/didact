@@ -80,7 +80,7 @@ put "/comments" do |env|
     halt env, status_code: 400, response: err || ""
   end
   cmt = Comment.find!(id)
-  raise UserErr.new(403) if env.user != cmt.user && !env.user.not_nil!.admin
+  raise UserErr.new(403) if env.user.not_nil!.id != cmt.user.id && !env.user.not_nil!.admin
   cmt.name = name
   cmt.body = body
   cmt.time_changed = Time.utc

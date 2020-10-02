@@ -31,7 +31,7 @@ class Comment < Granite::Base
     # If a user is provided, attach whether they're subscribed to the comment and whether it's theirs.
     if !user.nil?
       cmt["sub"] = self.subs.find_by(user_id: user.id).try &.sub || nil
-      cmt["owned"] = user == self.user
+      cmt["owned"] = user.id == self.user.id
     end
     cmt
   end
@@ -51,7 +51,7 @@ class Comment < Granite::Base
     raise UserErr.new(400, "You need a name") if self.name == ""
     raise UserErr.new(400, "Your name can't be longer than 30 characters") if self.name.size > 30
     raise UserErr.new(400, "That name is taken by a registered user.") \
-       if (name_owner = User.find_by(name: self.name)) && name_owner != self.user
+       if (name_owner = User.find_by(name: self.name)) && name_owner.id != self.user.id
     # One can be missing, but not both.
     raise UserErr.new(400) if @reply_to.nil? && @article_path.nil?
   end
