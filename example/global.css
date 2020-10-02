@@ -59,7 +59,8 @@ nav {
 a { color: var(--linkcolor) }
 a:visited {	color: var(--linkvisitedcolor) }
 /* links that are part of the user interface get a special color */
-a.ui-link, a.ui-link:visited { color: yellow }
+a.ui-link, a.ui-link:visited { color: var(--yellowcolor) }
+nav > a { color: yellow }
 code, pre {
 	/* this 'monospace, monospace' hack works around dumb behavior of browsers: http://code.iamkate.com/html-and-css/fixing-browsers-broken-monospace-font-handling/ */
 	font-family: monospace, monospace;
