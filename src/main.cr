@@ -21,10 +21,11 @@ class UserErr < Exception
   end
 end
 
-# Middleware to check what user is sending the request.
+# Middleware to check what user is sending the request and set default content type.
 before_all do |env|
   auth = env.request.cookies["auth"]?
   env.user = User.find_by(auth: auth.value) if !auth.nil?
+  env.response.content_type = "application/json"
 end
 
 # All errors we want to specially handle are caught here, even ones that send codes other than 500.
