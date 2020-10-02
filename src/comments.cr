@@ -54,6 +54,10 @@ post "/comments" do |env|
     if User.find_by(email: email).nil?
       # The email isn't claimed yet, so let them register it.
       env.user = register_email email.not_nil!
+      if env.params.json["sub_site"]?
+        env.user.not_nil!.sub_site = true
+        env.user.not_nil!.save!
+      end
     else
       raise UserErr.new 400, "That email belongs to a registered user. " +
                              "If it's you and you just claimed it, check your inbox for a registration link."
