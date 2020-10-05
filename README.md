@@ -81,6 +81,8 @@ Due to a technical limitation, the CSS needs to be duplicated between `content/g
 
 By default, most mail servers will either reject your mail or show it with some sort of "couldn't verify sender" warning (very likely to be sent to spam). You need to prove to the server that your email is coming from the address it says it is. The simplest way is to [set up an SPF DNS record for your domain](https://www.dmarcanalyzer.com/spf/how-to-create-an-spf-txt-record/).
 
+Note that the "Be notified when new articles are posted" setting doesn't do anything on its own; you can email all subscribers with `crystal src/scripts/email-subscribers.cr` (it'll let you enter the message). This is done because Didact doesn't control your publishing process so it doesn't know when a new article is posted, and because it's more flexible to make these emails manual (for example, you can post an unlisted page and not email people; you can email them about updates other than new articles; you can email them when you make major changes to an existing post but without technically posting it a new article, etc).
+
 ## Advanced instructions
 
 To rebuild faster after a change, you can run individual commands out of `build.sh` to rebuild only the components that need it instead of the whole thing. In particular, the server needs a rebuild after changing email templates, the templater needs a rebuild after changing content templates, and the Javascript needs a rebuild after changing `global.css`. (It also helps to build Crystal stuff without the `--release` flag. That flag turns on optimizations that make it make significantly longer to build.)

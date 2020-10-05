@@ -5,14 +5,19 @@ module Emails
   # Warning: passing multiple recipient addresses will put them all in the To header,
   # revealing their addresses to each other. Call this multiple times for emailing
   # multiple users.
-  def send(from, from_name, to : Array(String), subject, msg)
+  def send(from, from_name, to : Array(String), subject, msg, wait = false)
     sendmail = Process.new("sendmail", ["-f", from, "-F", from_name] + to,
       # sendmail doesn't have a subject parameter, so we send it in through stdin.
       input: IO::Memory.new("Subject: #{subject}\n\n" + msg), error: Process::Redirect::Inherit)
-    # If we couldn't send the email, at least log something.
-    spawn do
+    if wait
       status = sendmail.wait
-      puts "sendmail failed: #{status.inspect}" if !status.success?
+      raise "Failed to send mail: #{status.inspect}" if !status.success?
+    else
+      # If we couldn't send the email, at least log something.
+      spawn do
+        status = sendmail.wait
+        puts "sendmail failed: #{status.inspect}" if !status.success?
+      end
     end
   end
 

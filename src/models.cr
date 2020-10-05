@@ -1,3 +1,5 @@
+require "./cfg"
+Granite::Connections << Granite::Adapter::Pg.new(name: "db", url: "postgres://#{CFG.postgres.user}@localhost/#{CFG.postgres.db}")
 require "granite/adapter/pg"
 
 class Comment < Granite::Base
