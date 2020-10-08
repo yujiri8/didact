@@ -10,21 +10,20 @@ get "/comments" do |env|
     "comments":    cmts.map &.dict(user: env.user, raw: env.params.query["raw"]?),
     "article_sub": env.user ? !env.user.not_nil!.article_subs.find_by(path: article_path).nil? : nil,
   }
-  next resp.to_json
+  resp.to_json
 end
 
 get "/comments/recent" do |env|
-  next (Comment.limit(env.params.query["count"]?.try &.to_i || 10).map &.summary_dict).to_json
+  (Comment.limit(env.params.query["count"]?.try &.to_i || 10).map &.summary_dict).to_json
 end
 
 post "/comments/preview" do |env|
-  next Util.markdown(env.request.body.not_nil!.gets_to_end)
+  Util.markdown(env.request.body.not_nil!.gets_to_end)
 end
 
 post "/comments" do |env|
   begin
     email = env.params.json["email"]?.try &.as(String) || ""
-    sub_site = env.params.json["sub_site"]?.try &.as(Bool) || false
     cmt = Comment.new(
       name: env.params.json["name"].as(String).strip,
       body: env.params.json["body"].as(String),

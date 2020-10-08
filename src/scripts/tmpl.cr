@@ -47,7 +47,7 @@ def build_article(file)
   args["PATH"] = Path.new(file).relative_to(CONTENT_DIR).to_s.chomp(".html").chomp(".md")
   args["NAV"] = navbar_html(args["PATH"].as(String), args["NAV"]?.try &.as(String), args["TITLE"].as(String))
   args["BODY"] = file.ends_with?(".md") ? Sanemark.to_html(body, Sanemark::Options.new(allow_html: true)) : body
-  return TEMPLATES[args["TEMPLATE"]? || "default"].call args
+  TEMPLATES[args["TEMPLATE"]? || "default"].call args
 end
 
 # Parses the settings at the top of an article file and returns them as a hash.
@@ -63,7 +63,7 @@ def parse_directives(header)
       args[param] = val
     end
   end
-  return args
+  args
 end
 
 # Computes the HTML for the navbar from the path of the page and the NAV setting.
@@ -91,7 +91,7 @@ def navbar_html(path : String, nav : String | Nil, title : String)
     end
     navhtml += " &gt; <a class=\"ui-link\" href=\"#{running_path}/\">#{name}</a>"
   end
-  return navhtml + " &gt; " + (nav || title)
+  navhtml + " &gt; " + (nav || title)
 end
 
 OptionParser.parse do |parser|

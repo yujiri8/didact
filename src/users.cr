@@ -8,7 +8,7 @@ post "/users/login" do |env|
     halt env, 400
   end
   user = User.find_by(email: email)
-  unless !user.nil? && !user.pw.nil? && Crypto::Bcrypt::Password.new(user.not_nil!.pw.not_nil!).verify(pw)
+  if user.nil? || user.pw.nil? || !Crypto::Bcrypt::Password.new(user.not_nil!.pw.not_nil!).verify(pw)
     halt env, 401
   end
   grant_auth(env, user.not_nil!)
@@ -75,7 +75,7 @@ end
 
 get "/users/notifs" do |env|
   halt env, 401 if !env.user
-  next {
+  {
     "comment_subs":  env.user.not_nil!.comment_subs.map &.dict,
     "article_subs":  env.user.not_nil!.article_subs.map &.dict,
     "autosub":       env.user.not_nil!.autosub,
@@ -97,7 +97,7 @@ put "/users/notifs" do |env|
   # Comment subscription.
   if id
     # Make sure the comment exists.
-    cmt = Comment.find!(id)
+    Comment.find!(id)
     # Delete any existing subscription to avoid duplicates.
     sub = Subscription.find_by(user_id: env.user.not_nil!.id, comment_id: id)
     sub.destroy! if sub
