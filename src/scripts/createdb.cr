@@ -1,3 +1,5 @@
+#!/usr/bin/env crystal
+
 require "db"
 require "pg"
 
