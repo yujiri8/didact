@@ -26,6 +26,10 @@ before_all do |env|
   env.response.content_type = "application/json"
 end
 
+# Don't send the default error page.
+error 404 do |env|
+end
+
 # All errors we want to specially handle are caught here, even ones that send codes other than 500.
 error 500 do |env, exc|
   case exc
