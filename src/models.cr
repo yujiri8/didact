@@ -107,12 +107,3 @@ class ArticleSubscription < Granite::Base
     }
   end
 end
-
-class Word < Granite::Base
-  connection db
-  table words
-  column id : Int64, primary: true
-  column name : String
-  column meaning : String
-  column translations : Array(String)
-end
