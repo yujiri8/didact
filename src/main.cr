@@ -43,6 +43,7 @@ error 500 do |env, exc|
     Emails.send CFG.server_email, CFG.server_email_name, [CFG.admin_email], "Error at #{CFG.hostname}",
       Emails.err_notif(env, exc)
   end
+  nil
 end
 
 serve_static false
