@@ -2,7 +2,7 @@ get "/comments" do |env|
   if id = env.params.query["id"]?.try &.to_i?
     cmts = [Comment.find!(id)]
   elsif article_path = env.params.query["article_path"]?
-    cmts = Comment.where(article_path: article_path, reply_to: nil).select
+    cmts = Comment.where(article_path: article_path, reply_to: nil).order(time_added: :desc).select
   else
     raise UserErr.new 400
   end

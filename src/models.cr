@@ -28,7 +28,8 @@ class Comment < Granite::Base
       "body"         => (raw ? @body : Util.markdown @body.as(String)),
       "time_added"   => @time_added,
       "time_changed" => @time_changed,
-      "replies"      => recursion > 0 ? self.replies.map &.dict(user: user, raw: raw, recursion: recursion - 1) : self.replies.size.to_i64,
+      "replies"      => recursion > 0 ? self.replies.order(time_added: :desc).map &.dict(
+        user: user, raw: raw, recursion: recursion - 1) : self.replies.size.to_i64,
     } of String => CommentJson
     # If a user is provided, attach whether they're subscribed to the comment and whether it's theirs.
     if !user.nil?
