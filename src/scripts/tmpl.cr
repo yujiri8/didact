@@ -71,7 +71,7 @@ end
 def navbar_html(path : String, nav : String | Nil, title : String)
   return CFG.site_title if path == "index"
   path = path.chomp("/index")
-  navhtml = "<a class=\"ui-link\" href=\"/\">#{CFG.site_title}</a>"
+  navhtml = "<a style=\"color:yellow\" href=\"/\">#{CFG.site_title}</a>"
   running_path = "/"
   path.split("/")[..-2].each do |piece|
     running_path = File.join [running_path, piece]
@@ -89,7 +89,7 @@ def navbar_html(path : String, nav : String | Nil, title : String)
       # If there isn't an index file or it doesn't have a NAV, normalize the directory's name.
       piece.gsub(/[_-]/, " ").titleize
     end
-    navhtml += " &gt; <a class=\"ui-link\" href=\"#{running_path}/\">#{name}</a>"
+    navhtml += " &gt; <a style=\"color:yellow\" href=\"#{running_path}/\">#{name}</a>"
   end
   navhtml + " &gt; " + (nav || title)
 end
