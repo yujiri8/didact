@@ -1,6 +1,7 @@
 lib
 node_modules
 docs
+bin
 content
 html
 didact-server

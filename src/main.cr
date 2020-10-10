@@ -27,7 +27,7 @@ before_all do |env|
 end
 
 # Don't send the default error page.
-error 404 do |env|
+error 404 do
 end
 
 # All errors we want to specially handle are caught here, even ones that send codes other than 500.
