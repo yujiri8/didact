@@ -17,10 +17,10 @@ def createdb(dbname)
   DB.open "postgres://didact@localhost/#{dbname}" do |db|
     db.exec "CREATE TABLE users (
       id BIGSERIAL PRIMARY KEY,
-      email text NOT NULL,
+      email text NOT NULL UNIQUE,
       auth text NOT NULL,
       pw text,
-      name text,
+      name text UNIQUE,
       admin boolean NOT NULL,
       autosub boolean NOT NULL,
       disable_reset boolean NOT NULL,
