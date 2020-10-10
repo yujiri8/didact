@@ -23,11 +23,12 @@ class Comment
       "id"           => @id,
       "name"         => @name,
       "reply_to"     => @reply_to,
-      "body"         => (raw ? @body : Util.markdown @body.as(String)),
+      "body"         => (raw ? @body : Util.markdown @body),
       "time_added"   => @time_added,
       "time_changed" => @time_changed,
       "replies"      => recursion > 0 ? get_comments(db, "reply_to = ? ORDER BY time_added DESC", @id).to_a.map &.dict(
-        db, user_id: user_id, raw: raw, recursion: recursion - 1) : db.scalar("SELECT count(id) FROM comments WHERE reply_to = ?", @id).as(Int64),
+        db, user_id: user_id, raw: raw, recursion: recursion - 1) : db.scalar(
+        "SELECT count(id) FROM comments WHERE reply_to = ?", @id).as(Int64),
     } of String => CommentJson
     # If a user is provided, attach whether they're subscribed to the comment and whether it's theirs.
     if !user_id.nil?
@@ -73,5 +74,38 @@ class User
 
   def initialize(@email, @auth, @name = nil, @pw = nil, @disable_reset = false,
                  @admin = false, @autosub = false, @sub_site = false, @id = 0.to_i64)
+  end
+end
+
+class Word
+  property id : Int64
+  property name : String
+  property meaning : String
+  property translations : Array(String)
+  property notes : String
+  property tags : Array(String)
+  property time_added : Time
+  property time_changed : Time
+
+  def initialize(@name, @meaning, @notes, @time_added, @time_changed,
+                 @translations = [] of String, @tags = [] of String, @id = 0.to_i64)
+  end
+
+  def dict(raw : Bool)
+    {
+      "name"         => @name,
+      "meaning"      => @meaning,
+      "translations" => @translations,
+      "notes"        => (raw ? @notes : Util.markdown @notes),
+      "tags"         => @tags,
+      "time_added"   => @time_added,
+      "time_changed" => @time_changed,
+    }
+  end
+
+  # Raises exception if the word is invalid.
+  def validate
+    raise UserErr.new(400, "Name can't be empty") if @name == ""
+    raise UserErr.new(400, "Meaning can't be empty") if @meaning == ""
   end
 end

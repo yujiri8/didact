@@ -6,6 +6,7 @@ require "./db"
 require "./util"
 require "./comments"
 require "./users"
+require "./spem"
 require "./emails"
 
 db = DB.open "sqlite3://#{CFG.db}"

@@ -1,11 +1,13 @@
 COMMENT_FIELDS = "name, body, article_path, article_title, ip, ua, time_added, time_changed, reply_to, user_id"
+USER_FIELDS    = "email, auth, name, pw, disable_reset, admin, autosub, sub_site"
+WORD_FIELDS    = "name, meaning, notes, time_added, time_changed"
 
 def get_comments(db, where, *args)
-  db.query_all "SELECT id, #{COMMENT_FIELDS} FROM comments WHERE #{where}", args: args.to_a, as: Comment
+  db.query_all "SELECT id, #{COMMENT_FIELDS} FROM comments WHERE #{where}", *args, as: Comment
 end
 
 def get_comment(db, where, *args)
-  db.query_one "SELECT id, #{COMMENT_FIELDS} FROM comments WHERE #{where} LIMIT 1", args: args.to_a, as: Comment
+  db.query_one "SELECT id, #{COMMENT_FIELDS} FROM comments WHERE #{where} LIMIT 1", *args, as: Comment
 end
 
 def add_comment(db, comment)
@@ -20,17 +22,14 @@ def change_comment(db, comment)
   db.exec "UPDATE comments SET (#{COMMENT_FIELDS}) = (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) WHERE id = ?",
     comment.name, comment.body, comment.article_path, comment.article_title, comment.ip, comment.ua,
     comment.time_added, comment.time_changed, comment.reply_to, comment.user_id, comment.id
-  comment
 end
 
-USER_FIELDS = "email, auth, name, pw, disable_reset, admin, autosub, sub_site"
-
 def get_users(db, where, *args)
-  db.query_all "SELECT id, #{USER_FIELDS} FROM users WHERE #{where}", args: args.to_a, as: User
+  db.query_all "SELECT id, #{USER_FIELDS} FROM users WHERE #{where}", *args, as: User
 end
 
 def get_user(db, where, *args)
-  db.query_one "SELECT id, #{USER_FIELDS} FROM users WHERE #{where} LIMIT 1", args: args.to_a, as: User
+  db.query_one "SELECT id, #{USER_FIELDS} FROM users WHERE #{where} LIMIT 1", *args, as: User
 end
 
 def add_user(db, user)
@@ -107,4 +106,61 @@ def get_user_article_subs(db, user : Int64)
     subs << {"title" => rs.read(String), "path" => rs.read(String)}
   end
   subs
+end
+
+def get_words(db, where, args)
+  words = [] of Word
+  # There's some bizzarre use-after-free bug that happens with nested queries, so finish the first one
+  # before we go for the translations and tags.
+  db.query_each "SELECT id, #{WORD_FIELDS} FROM words WHERE #{where}", args: args do |rs|
+    word = Word.new(
+      id: rs.read(Int64),
+      name: rs.read(String),
+      meaning: rs.read(String),
+      notes: rs.read(String),
+      time_added: rs.read(Time),
+      time_changed: rs.read(Time),
+    )
+    words << word
+  end
+  words.each do |word|
+    word.translations = db.query_all "SELECT translation FROM translations WHERE word_id = ?", word.id, as: String
+    word.tags = db.query_all "SELECT tag FROM tags WHERE word_id = ?", word.id, as: String
+  end
+  words
+end
+
+def get_word(db, where, *args)
+  results = get_words db, where, *args
+  results[0]
+rescue IndexError
+  raise UserErr.new 404
+end
+
+def add_word(db, word)
+  db.transaction do |tx|
+    word.id = tx.connection.exec("INSERT INTO words (#{WORD_FIELDS}) VALUES (?, ?, ?, ?, ?)",
+      word.name, word.meaning, word.notes, word.time_added, word.time_changed).last_insert_id
+    save_translations_and_tags tx.connection, word
+    word
+  end
+end
+
+def change_word(db, word)
+  db.transaction do |tx|
+    tx.connection.exec "UPDATE words SET (#{WORD_FIELDS}) = (?, ?, ?, ?, ?) WHERE id = ?",
+      word.name, word.meaning, word.notes, word.time_added, word.time_changed, word.id
+    tx.connection.exec "DELETE from translations where word_id = ?", word.id
+    tx.connection.exec "DELETE from tags where word_id = ?", word.id
+    save_translations_and_tags tx.connection, word
+  end
+end
+
+def save_translations_and_tags(db, word)
+  word.translations.each do |t|
+    db.exec("INSERT INTO translations (word_id, translation) VALUES (?, ?)", word.id, t)
+  end
+  word.tags.each do |t|
+    db.exec("INSERT INTO tags (word_id, tag) VALUES (?, ?)", word.id, t)
+  end
 end

@@ -10,6 +10,7 @@ import './comment-section.js';
 import './recent-comments.js';
 import './auth-popup.js';
 import './notifs-panel.js';
+import './spem-search.js';
 
 // Apply saved theme.
 const currentTheme = localStorage.getItem('theme');
