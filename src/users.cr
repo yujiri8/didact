@@ -7,7 +7,7 @@ post "/users/login" do |env|
   rescue err
     halt env, 400
   end
-  user = User.find_by(email: email)
+  user = User.where{_email == email}.first
   if user.nil? || user.pw.nil? || !Crypto::Bcrypt::Password.new(user.not_nil!.pw.not_nil!).verify(pw)
     halt env, 401
   end
@@ -41,7 +41,7 @@ end
 # Validate an email, create the uesr, and send a confirm email. Returns the created user if successful.
 def register_email(email : String)
   raise UserErr.new(400, "That doesn't look like a valid email address") if !/[^@]+@[\w]+\.[\w]+/.match(email)
-  user = User.find_by(email: email)
+  user = User.where{_email == email}.first
   if user
     # They're asking to claim a registered email. Inform them if the user has disabled password reset.
     raise UserErr.new(403, "That email belongs to a registered user, who has disabled password reset.") \
@@ -51,7 +51,7 @@ def register_email(email : String)
     return user
   end
   # The email doesn't already exist. They're making a new account.
-  user = User.new(email: email, auth: gen_auth_token())
+  user = User.new({email: email, auth: gen_auth_token()})
   user.save!
   send_confirm_email(user)
   user
@@ -64,7 +64,7 @@ def send_confirm_email(user)
 end
 
 get "/users/prove" do |env|
-  user = User.find_by(auth: env.params.query["token"])
+  user = User.where{_auth == env.params.query["token"]}.first
   next env.redirect("/invalid_token") if !user
   # Might as well change the token.
   user.auth = gen_auth_token
@@ -99,8 +99,8 @@ put "/users/notifs" do |env|
     # Make sure the comment exists.
     Comment.find!(id)
     # Delete any existing subscription to avoid duplicates.
-    sub = Subscription.find_by(user_id: env.user.not_nil!.id, comment_id: id)
-    sub.destroy! if sub
+    sub = Subscription.where{_user_id == env.user.not_nil!.id && _comment_id == id}.first
+    sub.destroy if sub
     if !state.nil?
       Subscription.create!(user_id: env.user.not_nil!.id, comment_id: id, sub: state)
     end
@@ -113,8 +113,8 @@ put "/users/notifs" do |env|
     end
     path.chomp("index") if path.ends_with? "/index"
     # Delete any existing subscription to avoid duplicates.
-    sub = ArticleSubscription.find_by(user_id: env.user.not_nil!.id, path: path)
-    sub.destroy! if sub
+    sub = ArticleSubscription.where{_user_id == env.user.not_nil!.id && _path == path}.first
+    sub.destroy if sub
     ArticleSubscription.create!(user_id: env.user.not_nil!.id, path: path, title: title) if state
   end
 end

@@ -1,20 +1,21 @@
 get "/comments" do |env|
+  puts "a"
   if id = env.params.query["id"]?.try &.to_i?
     cmts = [Comment.find!(id)]
   elsif article_path = env.params.query["article_path"]?
-    cmts = Comment.where(article_path: article_path, reply_to: nil).order(time_added: :desc).select
+    cmts = Comment.where{_article_path == article_path && _reply_to == nil}.order(time_added: :desc).to_a
   else
     raise UserErr.new 400
   end
   resp = {
     "comments":    cmts.map &.dict(user: env.user, raw: env.params.query["raw"]?),
-    "article_sub": env.user ? !env.user.not_nil!.article_subs.find_by(path: article_path).nil? : nil,
+    "article_sub": env.user ? env.user.not_nil!.article_subs_query.where{_path == article_path}.exists? : nil,
   }
   resp.to_json
 end
 
 get "/comments/recent" do |env|
-  (Comment.limit(env.params.query["count"]?.try &.to_i || 10).map &.summary_dict).to_json
+  (Comment.all.limit(env.params.query["count"]?.try &.to_i || 10).to_a.map &.summary_dict).to_json
 end
 
 post "/comments/preview" do |env|
@@ -24,7 +25,7 @@ end
 post "/comments" do |env|
   begin
     email = env.params.json["email"]?.try &.as(String) || ""
-    cmt = Comment.new(
+    cmt = Comment.new({
       name: env.params.json["name"].as(String).strip,
       body: env.params.json["body"].as(String),
       reply_to: env.params.json["reply_to"]?.try &.as(Int64),
@@ -33,7 +34,7 @@ post "/comments" do |env|
       ip: env.request.headers["x-forwarded-for"]?,
       ua: env.request.headers["user-agent"]?,
       time_added: Time.utc,
-    )
+    })
   rescue err
     halt env, 400
   end
@@ -50,7 +51,7 @@ post "/comments" do |env|
   # Make sure they aren't impersonating a registered user.
   # If it's not a logged in user, check for an email.
   if env.user.nil? && email != ""
-    if User.find_by(email: email).nil?
+    if !User.where{_email == email}.exists?
       # The email isn't claimed yet, so let them register it.
       env.user = register_email email.not_nil!
       if env.params.json["sub_site"]?
@@ -79,7 +80,7 @@ put "/comments" do |env|
     halt env, status_code: 400, response: err || ""
   end
   cmt = Comment.find!(id)
-  raise UserErr.new(403) if env.user.not_nil!.id != cmt.user.id && !env.user.not_nil!.admin
+  raise UserErr.new(403) if env.user.not_nil!.id != cmt.user_id && !env.user.not_nil!.admin
   cmt.name = name
   cmt.body = body
   cmt.time_changed = Time.utc
@@ -91,30 +92,30 @@ delete "/comments/:id" do |env|
   halt env, status_code: 401 if !env.user
   halt env, status_code: 403 if !env.user.not_nil!.admin
   # TODO get a real delete feature.
-  Comment.find!(env.params.url["id"].to_i).destroy!
+  Comment.find!(env.params.url["id"].to_i).destroy
 end
 
 def send_reply_notifs(new_comment : Comment)
   listening = Set.new [] of String
   ignoring = Set.new [] of String
   # Never notify people about their own comment.
-  ignoring.add new_comment.user.email if new_comment.user_id
+  ignoring.add new_comment.user.not_nil!.email if new_comment.user_id
   # Travel up the tree, finding the lowest-level subscription or ignore for each user.
   comment = new_comment
   while true
     comment.subs.each do |sub|
       # If it's a sub and not overridden by a more specific ignore.
-      listening.add(sub.user.email) if sub.sub && !ignoring.includes?(sub.user.email)
+      listening.add(sub.user.not_nil!.email) if sub.sub && !ignoring.includes?(sub.user.not_nil!.email)
       # if it's an ignore and not overridden by a more specific sub.
-      ignoring.add(sub.user.email) if !sub.sub && !listening.includes?(sub.user.email)
+      ignoring.add(sub.user.not_nil!.email) if !sub.sub && !listening.includes?(sub.user.not_nil!.email)
     end
     # If we're not at the top level, go on with the parent.
     if comment.reply_to
-      comment = comment.parent
+      comment = comment.parent.not_nil!
     else
       # If we're at the top level, do article subs.
-      ArticleSubscription.where(path: comment.article_path).each do |sub|
-        listening.add(sub.user.email) if !ignoring.includes?(sub.user.email)
+      ArticleSubscription.where{_path == comment.article_path}.each do |sub|
+        listening.add(sub.user.not_nil!.email) if !ignoring.includes?(sub.user.not_nil!.email)
       end
       break
     end
