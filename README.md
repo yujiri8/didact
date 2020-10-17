@@ -31,17 +31,15 @@ Didact's philosophy is explained [here](https://yujiri.xyz/didact).
 	5. Go back up to the repository root.
 	6. Run `./build.sh`. This may take a minute. **Note that you need to re-run this script after changing any template files.**
 
-6. Install configurations for dependencies by running `src/scripts/install.cr`.
+6. Copy `didact.yml.example` to `didact.yml` and fill out the necessary settings for your site. The example file has comments explaining the settings.
 
-7. Run `src/scripts/createdb.cr didact` to setup the PostgreSQL database.
+7. Install configurations for dependencies by running `src/scripts/install.cr`.
 
-8. Your content goes in `content/` (see [Adding content](#adding-content)). The folder is not tracked by git, and the recommended way to use Didact is to store your content in its own repository that you put there.
+8. Run `src/scripts/createdb.cr didact` to setup the PostgreSQL database.
+
+9. Your content goes in `content/` (see [Adding content](#adding-content)). The folder is not tracked by git, and the recommended way to use Didact is to store your content in its own repository that you put there.
 
 	Nginx will need read access to `html/`. If you don't want to give it read access to your home folder, you can achieve this by making a symlink to `html/` in a place that Nginx can read.
-
-## Configuration
-
-`didact.yml` is the configuration file. It's in [YAML format](https://yaml.org) and the default contains all the settings with comments to explain them. You do need to set a few of them.
 
 ## Adding content
 

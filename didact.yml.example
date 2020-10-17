@@ -3,11 +3,11 @@ hostname: mysite.com
 # The title to display
 site_title: My Site
 # The From address used in notification emails and such.
-server_email: ""
+server_email: "notifications@mysite.com"
 # The sender name that'll be displayed more prominently in most email clients.
-server_email_name: ""
+server_email_name: "My Site notifications"
 # Your email address, so Didact can alert you when there's an error.
-admin_email: ""
+admin_email: "admin@mysite.com"
 
 # Settings you don't need to set.
 # Filepath to the site's icon, which will be displayed on the tab or bookmark in browsers.
