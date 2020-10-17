@@ -21,7 +21,7 @@ end
 # Shortcut.
 def set_cookie(env, name, val, max_age = CFG.cookie_lifetime)
   env.response.cookies << HTTP::Cookie.new(name, val, secure: true,
-    samesite: HTTP::Cookie::SameSite::Lax, expires: Time.utc + CFG.cookie_lifetime.seconds)
+    samesite: HTTP::Cookie::SameSite::Lax, expires: Time.utc + max_age.seconds)
 end
 
 # Sets login cookies.
