@@ -29,7 +29,7 @@ def grant_auth(env : HTTP::Server::Context, user : User)
   set_cookie(env, "auth", user.auth)
   set_cookie(env, "name", user.name || "", max_age: user.name ? CFG.cookie_lifetime : 0)
   set_cookie(env, "email", user.email || "", max_age: user.email ? CFG.cookie_lifetime : 0)
-  set_cookie(env, "admin", "1", max_age: user.admin ? CFG.cookie_lifetime : 0) if user.admin
+  set_cookie(env, "admin", "1", max_age: user.admin ? CFG.cookie_lifetime : 0)
 end
 
 # A wrapper around register_email that turns it into a valid endpoint handler.
