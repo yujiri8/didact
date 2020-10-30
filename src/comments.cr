@@ -1,5 +1,4 @@
 get "/comments" do |env|
-  puts "a"
   if id = env.params.query["id"]?.try &.to_i?
     cmts = [Comment.find!(id)]
   elsif article_path = env.params.query["article_path"]?
