@@ -25,7 +25,7 @@ Didact's philosophy is explained [here](https://yujiri.xyz/didact).
 5. Compile Didact:
 
 	1. Be in the repository root.
-	2. Run `shards` to install Crystal dependencies.
+	2. Run `shards --production` to install Crystal dependencies.
 	3. Go into `js/`.
 	4. Run `npm install` to install Javascript dependencies.
 	5. Go back up to the repository root.

@@ -12,8 +12,10 @@ dependencies:
     branch: master
   sanemark:
     github: yujiri8/sanemark-crystal
-  ameba:
-    github: crystal-ameba/ameba
   jennifer:
     github: imdrasil/jennifer.cr
     branch: master
+
+development_dependencies:
+  ameba:
+    github: crystal-ameba/ameba
