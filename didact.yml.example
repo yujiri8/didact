@@ -17,7 +17,5 @@ admin_email: "admin@mysite.com"
 # preview_image: "" # should be a full URL
 # twitter: "@username"
 cookie_lifetime: 2592000 # In seconds. This is a month.
-# Settings to connect to PostgreSQL.
-postgres:
-  db: didact
-  user: didact
+# Filepath to the database that will store comments and user data.
+db: ./didact.sqlite

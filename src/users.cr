@@ -7,7 +7,7 @@ post "/users/login" do |env|
   rescue err
     halt env, 400
   end
-  user = User.where{_email == email}.first
+  user = get_user(env.db, "email = ?", email)
   if user.nil? || user.pw.nil? || !Crypto::Bcrypt::Password.new(user.not_nil!.pw.not_nil!).verify(pw)
     halt env, 401
   end
@@ -35,13 +35,13 @@ end
 # A wrapper around register_email that turns it into a valid endpoint handler.
 post "/users/claim" do |env|
   halt env, 400 if env.params.json["email"]?.nil?
-  register_email(env.params.json["email"].as(String))
+  register_email(env.db, env.params.json["email"].as(String))
 end
 
 # Validate an email, create the uesr, and send a confirm email. Returns the created user if successful.
-def register_email(email : String)
+def register_email(db, email : String)
   raise UserErr.new(400, "That doesn't look like a valid email address") if !/[^@]+@[\w]+\.[\w]+/.match(email)
-  user = User.where{_email == email}.first
+  user = get_users(db, "email = ?", email)[0]?
   if user
     # They're asking to claim a registered email. Inform them if the user has disabled password reset.
     raise UserErr.new(403, "That email belongs to a registered user, who has disabled password reset.") \
@@ -51,8 +51,8 @@ def register_email(email : String)
     return user
   end
   # The email doesn't already exist. They're making a new account.
-  user = User.new({email: email, auth: gen_auth_token()})
-  user.save!
+  user = User.new(email: email, auth: gen_auth_token())
+  add_user db, user
   send_confirm_email(user)
   user
 end
@@ -64,11 +64,11 @@ def send_confirm_email(user)
 end
 
 get "/users/prove" do |env|
-  user = User.where{_auth == env.params.query["token"]}.first
-  next env.redirect("/invalid_token") if !user
+  user = get_users(env.db, "auth = ?", env.params.query["token"])[0]?
+  next env.redirect("/invalid_token") if user.nil?
   # Might as well change the token.
   user.auth = gen_auth_token
-  user.save!
+  change_user env.db, user
   env.redirect("/account")
   grant_auth(env, user)
 end
@@ -76,8 +76,8 @@ end
 get "/users/notifs" do |env|
   halt env, 401 if !env.user
   {
-    "comment_subs":  env.user.not_nil!.comment_subs.map &.dict,
-    "article_subs":  env.user.not_nil!.article_subs.map &.dict,
+    "comment_subs":  get_user_comment_subs(env.db, env.user.not_nil!.id),
+    "article_subs":  get_user_article_subs(env.db, env.user.not_nil!.id),
     "autosub":       env.user.not_nil!.autosub,
     "disable_reset": env.user.not_nil!.disable_reset,
     "site":          env.user.not_nil!.sub_site,
@@ -97,25 +97,11 @@ put "/users/notifs" do |env|
   # Comment subscription.
   if id
     # Make sure the comment exists.
-    Comment.find!(id)
-    # Delete any existing subscription to avoid duplicates.
-    sub = Subscription.where{_user_id == env.user.not_nil!.id && _comment_id == id}.first
-    sub.destroy if sub
-    if !state.nil?
-      Subscription.create!(user_id: env.user.not_nil!.id, comment_id: id, sub: state)
-    end
+    env.db.scalar("SELECT id FROM comments WHERE id = ?", id)
+    set_sub_status(env.db, env.user.not_nil!.id, id, state)
     # Article subscription.
   elsif path
-    begin
-      title = Util.get_article_title(path)
-    rescue
-      raise UserErr.new 404, "No such article"
-    end
-    path.chomp("index") if path.ends_with? "/index"
-    # Delete any existing subscription to avoid duplicates.
-    sub = ArticleSubscription.where{_user_id == env.user.not_nil!.id && _path == path}.first
-    sub.destroy if sub
-    ArticleSubscription.create!(user_id: env.user.not_nil!.id, path: path, title: title) if state
+    set_article_sub(env.db, env.user.not_nil!.id, path, state.as(Bool))
   end
 end
 
@@ -129,7 +115,7 @@ put "/users/pw" do |env|
   env.user.not_nil!.pw = Crypto::Bcrypt::Password.create(pw).to_s
   # Change the auth token after changing password.
   env.user.not_nil!.auth = gen_auth_token
-  env.user.not_nil!.save!
+  change_user env.db, env.user.not_nil!
   grant_auth(env, env.user.not_nil!)
 end
 
@@ -141,7 +127,7 @@ put "/users/subsite" do |env|
     raise UserErr.new 400
   end
   env.user.not_nil!.sub_site = sub_site
-  env.user.not_nil!.save!
+  change_user env.db, env.user.not_nil!
 end
 
 put "/users/autosub" do |env|
@@ -152,7 +138,7 @@ put "/users/autosub" do |env|
     raise UserErr.new 400
   end
   env.user.not_nil!.autosub = autosub
-  env.user.not_nil!.save!
+  change_user env.db, env.user.not_nil!
 end
 
 put "/users/disablereset" do |env|
@@ -163,5 +149,5 @@ put "/users/disablereset" do |env|
     raise UserErr.new 400
   end
   env.user.not_nil!.disable_reset = disable_reset
-  env.user.not_nil!.save!
+  change_user env.db, env.user.not_nil!
 end

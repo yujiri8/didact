@@ -1,13 +1,18 @@
 require "kemal"
+require "sqlite3"
 require "./cfg"
 require "./models"
+require "./db"
 require "./util"
 require "./comments"
 require "./users"
 require "./emails"
 
+db = DB.open "sqlite3://#{CFG.db}"
+
 class HTTP::Server::Context
   property user : User?
+  property! db : DB::Database
 end
 
 # An error that should be shown to the user.
@@ -19,11 +24,12 @@ class UserErr < Exception
   end
 end
 
-# Middleware to check what user is sending the request and set default content type.
+# Middleware to set some environment parameters.
 before_all do |env|
   auth = env.request.cookies["auth"]?
-  env.user = User.where{ _auth == auth.value }.first if !auth.nil?
+  env.user = get_users(db, "auth = ?", auth.value)[0]? if !auth.nil?
   env.response.content_type = "application/json"
+  env.db = db
 end
 
 # Don't send the default error page.
@@ -33,7 +39,7 @@ end
 # All errors we want to specially handle are caught here, even ones that send codes other than 500.
 error 500 do |env, exc|
   case exc
-  when Jennifer::RecordNotFound
+  when DB::NoResultsError
     env.response.status_code = 404
   when UserErr
     env.response.status_code = exc.code

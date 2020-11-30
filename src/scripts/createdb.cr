@@ -1,20 +1,12 @@
 #!/usr/bin/env crystal
 
 require "db"
-require "pg"
+require "sqlite3"
+require "../cfg"
 
-# Will destroy the database if it already exists. The database will be owned by Postgres user "didact".
+# Will destroy the database if it already exists.
 def createdb(dbname)
-  DB.open "postgres://postgres@localhost/postgres" do |db|
-    # Create the didact user if it doesn't exist.
-    unless db.scalar "SELECT EXISTS (SELECT rolname FROM pg_roles WHERE rolname = 'didact')"
-      db.exec "CREATE ROLE didact WITH LOGIN"
-    end
-    db.exec "DROP DATABASE IF EXISTS #{dbname}"
-    db.exec "CREATE DATABASE #{dbname} WITH OWNER didact"
-  end
-  # Now connect to the created database and fill it out.
-  DB.open "postgres://didact@localhost/#{dbname}" do |db|
+  DB.open "sqlite3:./#{dbname}" do |db|
     db.exec "CREATE TABLE users (
       id BIGSERIAL PRIMARY KEY,
       email text NOT NULL UNIQUE,
@@ -54,9 +46,4 @@ def createdb(dbname)
   end
 end
 
-if ARGV.size == 0
-  STDERR << "Specify a database name."
-  Process.exit 1
-end
-
-createdb ARGV[0]
+createdb CFG.db

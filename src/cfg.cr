@@ -11,12 +11,7 @@ class Cfg
   property twitter : String?
   property preview_image : String?
   property cookie_lifetime : Int64
-  property postgres : CfgPostgres
-end
-
-class CfgPostgres
-  include YAML::Serializable
-  property db : String, user : String
+  property db : String
 end
 
 CFG = begin

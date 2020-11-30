@@ -98,7 +98,7 @@ OptionParser.parse do |parser|
   parser.banner = "Usage: tmpl <files ...>\n" +
                   "Folders will be recursed.\n" +
                   "Options:\n"
-  parser.on "-o", "--stdout", "write output to stdout instead of to the deployment dir." { stdout = true }
+  parser.on "-o", "--stdout", "write output to stdout instead of to the deployment folder." { stdout = true }
   parser.invalid_option do |opt|
     STDERR.puts "Unrecognized option: #{opt}"
     STDERR.puts parser

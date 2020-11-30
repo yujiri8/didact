@@ -1,20 +1,21 @@
 get "/comments" do |env|
-  if id = env.params.query["id"]?.try &.to_i?
-    cmts = [Comment.find!(id)]
+  cmts = if id = env.params.query["id"]?.try &.to_i?
+    get_comments(env.db, "id = ?", id)
   elsif article_path = env.params.query["article_path"]?
-    cmts = Comment.where{_article_path == article_path && _reply_to == nil}.order(time_added: :desc).to_a
+    get_comments(env.db, "article_path == ? AND reply_to IS NULL ORDER BY time_added DESC", article_path)
   else
     raise UserErr.new 400
   end
   resp = {
-    "comments":    cmts.map &.dict(user: env.user, raw: env.params.query["raw"]?),
-    "article_sub": env.user ? env.user.not_nil!.article_subs_query.where{_path == article_path}.exists? : nil,
-  }
+    "comments" => cmts.map &.dict(env.db, user_id: env.user.try &.id, raw: env.params.query["raw"]?),
+  } of String => Array(Hash(String, Comment::CommentJson)) | Bool
+  resp["article_sub"] = env.db.scalar("SELECT EXISTS (SELECT id FROM article_subs WHERE path = ? AND user_id = ?)",
+    article_path, env.user.not_nil!.id).as(Int64) != 0 if !env.user.nil?
   resp.to_json
 end
 
 get "/comments/recent" do |env|
-  (Comment.all.limit(env.params.query["count"]?.try &.to_i || 10).to_a.map &.summary_dict).to_json
+  (get_comments(env.db, "true ORDER BY time_added DESC LIMIT ?", env.params.query["count"]?.try &.to_i || 10).map &.summary_dict).to_json
 end
 
 post "/comments/preview" do |env|
@@ -24,7 +25,7 @@ end
 post "/comments" do |env|
   begin
     email = env.params.json["email"]?.try &.as(String) || ""
-    cmt = Comment.new({
+    cmt = Comment.new(
       name: env.params.json["name"].as(String).strip,
       body: env.params.json["body"].as(String),
       reply_to: env.params.json["reply_to"]?.try &.as(Int64),
@@ -33,14 +34,14 @@ post "/comments" do |env|
       ip: env.request.headers["x-forwarded-for"]?,
       ua: env.request.headers["user-agent"]?,
       time_added: Time.utc,
-    })
+    )
   rescue err
     halt env, 400
   end
-  cmt.validate
+  cmt.validate env.db
   # Replies inherit their article path and title from their reply_to.
   if cmt.reply_to
-    parent = Comment.find!(cmt.reply_to)
+    parent = get_comment(env.db, "id = ?", cmt.reply_to)
     cmt.article_path = parent.article_path
     cmt.article_title = parent.article_title
   else
@@ -50,12 +51,12 @@ post "/comments" do |env|
   # Make sure they aren't impersonating a registered user.
   # If it's not a logged in user, check for an email.
   if env.user.nil? && email != ""
-    if !User.where{_email == email}.exists?
+    if !get_users(env.db, "email = ?", email).size
       # The email isn't claimed yet, so let them register it.
-      env.user = register_email email.not_nil!
+      env.user = register_email env.db, email.not_nil!
       if env.params.json["sub_site"]?
         env.user.not_nil!.sub_site = true
-        env.user.not_nil!.save!
+        add_user env.db, env.user.not_nil!
       end
     else
       raise UserErr.new 400, "That email belongs to a registered user. " +
@@ -63,10 +64,10 @@ post "/comments" do |env|
     end
   end
   cmt.user_id = env.user.try &.id
-  cmt.save!
+  add_comment env.db, cmt
   # Subscribe the user who posted it.
-  Subscription.create! user_id: env.user.not_nil!.id, comment_id: cmt.id if env.user.try &.autosub
-  spawn { send_reply_notifs cmt }
+  set_sub_status(env.db, env.user.not_nil!.id, cmt.id, true) if env.user.try &.autosub
+  spawn { send_reply_notifs env.db, cmt }
 end
 
 put "/comments" do |env|
@@ -78,43 +79,42 @@ put "/comments" do |env|
   rescue err
     halt env, status_code: 400, response: err || ""
   end
-  cmt = Comment.find!(id)
+  cmt = get_comment(env.db, "id = ?", id)
   raise UserErr.new(403) if env.user.not_nil!.id != cmt.user_id && !env.user.not_nil!.admin
   cmt.name = name
   cmt.body = body
   cmt.time_changed = Time.utc
-  cmt.validate
-  cmt.save!
+  cmt.validate env.db
+  change_comment env.db, cmt
 end
 
 delete "/comments/:id" do |env|
   halt env, status_code: 401 if !env.user
   halt env, status_code: 403 if !env.user.not_nil!.admin
-  # TODO get a real delete feature.
-  Comment.find!(env.params.url["id"].to_i).destroy
+  env.db.exec("DELETE FROM comments WHERE id = ?", env.params.url["id"].to_i)
 end
 
-def send_reply_notifs(new_comment : Comment)
+def send_reply_notifs(db, new_comment : Comment)
   listening = Set.new [] of String
   ignoring = Set.new [] of String
   # Never notify people about their own comment.
-  ignoring.add new_comment.user.not_nil!.email if new_comment.user_id
+  ignoring.add db.scalar("SELECT email FROM users WHERE id = ?", new_comment.user_id).as(String) if new_comment.user_id
   # Travel up the tree, finding the lowest-level subscription or ignore for each user.
   comment = new_comment
-  while true
-    comment.subs.each do |sub|
-      # If it's a sub and not overridden by a more specific ignore.
-      listening.add(sub.user.not_nil!.email) if sub.sub && !ignoring.includes?(sub.user.not_nil!.email)
-      # if it's an ignore and not overridden by a more specific sub.
-      ignoring.add(sub.user.not_nil!.email) if !sub.sub && !listening.includes?(sub.user.not_nil!.email)
+  loop do
+    get_comment_subs(db, comment.id).each do |email, sub|
+        # If it's a sub and not overridden by a more specific ignore.
+        listening.add(email) if sub && !ignoring.includes?(email)
+        # if it's an ignore and not overridden by a more specific sub.
+        ignoring.add(email) if !sub && !listening.includes?(email)
     end
     # If we're not at the top level, go on with the parent.
-    if comment.reply_to
-      comment = comment.parent.not_nil!
+    if !comment.reply_to.nil?
+      comment = get_comments(db, "id = ?", comment.reply_to)[0]
     else
       # If we're at the top level, do article subs.
-      ArticleSubscription.where{_path == comment.article_path}.each do |sub|
-        listening.add(sub.user.not_nil!.email) if !ignoring.includes?(sub.user.not_nil!.email)
+      get_article_subs(db, comment.article_path).each do |email|
+        listening.add(email) if !ignoring.includes?(email)
       end
       break
     end

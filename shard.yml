@@ -5,16 +5,13 @@ authors:
   - Yujiri <yujiri@protonmail.com>
 
 dependencies:
-  pg:
-    github: will/crystal-pg
+  sqlite3:
+    github: crystal-lang/crystal-sqlite3
+    # branch: master
   kemal:
     github: kemalcr/kemal
-    branch: master
   sanemark:
     github: yujiri8/sanemark-crystal
-  jennifer:
-    github: imdrasil/jennifer.cr
-    branch: master
 
 development_dependencies:
   ameba:

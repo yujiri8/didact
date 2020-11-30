@@ -1,10 +1,13 @@
 require "../cfg"
 require "../emails"
 require "../models"
+require "../db"
 
 footer = "To edit your notification settings, visit https://#{CFG.hostname}/account."
 
-subs = User.where(sub_site: true).select
+db = DB.open "sqlite3://#{CFG.db}"
+
+subs = get_users(db, "sub_site")
 if subs.size == 0
   puts "You have no site subscribers. Don't waste your breath."
   exit 0
