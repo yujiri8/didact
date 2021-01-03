@@ -26,10 +26,8 @@ Didact's philosophy is explained [here](https://yujiri.xyz/didact).
 
 	1. Be in the repository root.
 	2. Run `shards --production` to install Crystal dependencies.
-	3. Go into `js/`.
-	4. Run `npm install` to install Javascript dependencies.
-	5. Go back up to the repository root.
-	6. Run `./build.sh`. This may take a minute. **Note that you need to re-run this script after changing any template files.**
+	3. Run `npm install` to install Javascript dependencies.
+	4. Run `./build.sh`. This may take a minute. **Note that you need to re-run this script after changing any template files.**
 
 6. Copy `didact.yml.example` to `didact.yml` and fill out the necessary settings for your site. The example file has comments explaining the settings.
 
