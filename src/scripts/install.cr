@@ -3,6 +3,7 @@
 require "../cfg"
 require "ecr"
 
+# On Linux, Nginx config is under /etc. On FreeBSD, user-installed stuff is prefixed with /usr/local.
 prefix = File.exists?("/usr/local/etc/nginx") ? "/usr/local" : ""
 
 File.open("#{prefix}/etc/nginx/nginx.conf", "w") do |file|
