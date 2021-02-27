@@ -64,10 +64,12 @@ nav > a { color: yellow }
 code, pre {
 	/* this 'monospace, monospace' hack works around dumb behavior of browsers: http://code.iamkate.com/html-and-css/fixing-browsers-broken-monospace-font-handling/ */
 	font-family: monospace, monospace;
+}
+code {
+	background-color: var(--tintcolor);
 	white-space: pre-wrap;
 	word-break: break-word;
 }
-code { background-color: var(--tintcolor) }
 pre > code { display: block }
 .highlight { background-color: #ff06 }
 .note:before { content: '[' }
