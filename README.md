@@ -6,7 +6,7 @@ Didact's philosophy is explained [here](https://yujiri.xyz/didact).
 
 1. Log into your server.
 
-2. Clone the Didact repository with [Git](https://git-scm.com) (it will never be packaged in a binary distribution): `git clone https://github.com/yujiri8/didact`. Alternately, download it locally and copy it to your server.
+2. Clone the Didact repository with [Git](https://git-scm.com) (it will never be packaged in a binary distribution): `git clone https://github.com/yujiri8/didact`.
 
 3. Install the dependencies. They should be in the repository for any Unix operating system, but the exact names of packages might vary so I can't give exact install instructions. The dependencies are:
 

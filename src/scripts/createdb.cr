@@ -1,6 +1,5 @@
 #!/usr/bin/env crystal
 
-require "db"
 require "sqlite3"
 require "../cfg"
 
@@ -8,7 +7,7 @@ require "../cfg"
 def createdb(dbname)
   DB.open "sqlite3:./#{dbname}" do |db|
     db.exec "CREATE TABLE users (
-      id BIGSERIAL PRIMARY KEY,
+      id INTEGER PRIMARY KEY,
       email text NOT NULL UNIQUE,
       auth text NOT NULL,
       pw text,
@@ -19,7 +18,7 @@ def createdb(dbname)
       sub_site boolean NOT NULL
     )"
     db.exec "CREATE TABLE comments (
-      id BIGSERIAL PRIMARY KEY,
+      id INTEGER PRIMARY KEY,
       name text NOT NULL,
       body text NOT NULL,
       article_path text NOT NULL,
@@ -32,13 +31,13 @@ def createdb(dbname)
       user_id bigint REFERENCES users(id) ON DELETE SET NULL
     )"
     db.exec "CREATE TABLE subs (
-      id BIGSERIAL PRIMARY KEY,
+      id INTEGER PRIMARY KEY,
       user_id bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       comment_id bigint NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
       sub boolean NOT NULL
     )"
     db.exec "CREATE TABLE article_subs (
-      id BIGSERIAL PRIMARY KEY,
+      id INTEGER PRIMARY KEY,
       user_id bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       path text NOT NULL,
       title text NOT NULL

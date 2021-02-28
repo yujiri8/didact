@@ -4,23 +4,23 @@
     "build": "crystal pre-build-scripts/copycss.cr && npx webpack"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.1",
-    "@babel/preset-env": "^7.11.0",
+    "@babel/core": "^7.13.8",
+    "@babel/preset-env": "^7.13.8",
     "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.1.0",
+    "babel-loader": "^8.2.2",
     "babel-plugin-bare-import-rewrite": "^2.0.0",
-    "eslint": "^7.6.0",
+    "eslint": "^7.21.0",
     "eslint-loader": "^4.0.2",
     "eslint-plugin-only-warn": "^1.0.2",
-    "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "webpack": "^5.24.2",
+    "webpack-cli": "^4.5.0"
   },
   "dependencies": {
-    "@material/mwc-dialog": "0.18.0",
-    "@material/mwc-snackbar": "0.18.0",
-    "@material/mwc-switch": "0.18.0",
+    "@material/mwc-dialog": "0.20.0",
+    "@material/mwc-snackbar": "0.20.0",
+    "@material/mwc-switch": "0.20.0",
     "lit-element": "^2.3.1",
     "lit-html": "^1.2.1",
-    "lit-toast": "^1.2.0"
+    "lit-toast": "^1.5.1"
   }
 }

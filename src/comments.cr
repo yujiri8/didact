@@ -1,11 +1,11 @@
 get "/comments" do |env|
   cmts = if id = env.params.query["id"]?.try &.to_i?
-    get_comments(env.db, "id = ?", id)
-  elsif article_path = env.params.query["article_path"]?
-    get_comments(env.db, "article_path == ? AND reply_to IS NULL ORDER BY time_added DESC", article_path)
-  else
-    raise UserErr.new 400
-  end
+           get_comments(env.db, "id = ?", id)
+         elsif article_path = env.params.query["article_path"]?
+           get_comments(env.db, "article_path == ? AND reply_to IS NULL ORDER BY time_added DESC", article_path)
+         else
+           raise UserErr.new 400
+         end
   resp = {
     "comments" => cmts.map &.dict(env.db, user_id: env.user.try &.id, raw: env.params.query["raw"]?),
   } of String => Array(Hash(String, Comment::CommentJson)) | Bool
@@ -15,10 +15,12 @@ get "/comments" do |env|
 end
 
 get "/comments/recent" do |env|
-  (get_comments(env.db, "true ORDER BY time_added DESC LIMIT ?", env.params.query["count"]?.try &.to_i || 10).map &.summary_dict).to_json
+  (get_comments(env.db, "true ORDER BY time_added DESC LIMIT ?", env.params.query["count"]?.try &.to_i || 10) \
+    .map &.summary_dict).to_json
 end
 
 post "/comments/preview" do |env|
+  env.response.headers["Content-Type"] = "text/html"
   Util.markdown(env.request.body.not_nil!.gets_to_end)
 end
 
@@ -51,16 +53,14 @@ post "/comments" do |env|
   # Make sure they aren't impersonating a registered user.
   # If it's not a logged in user, check for an email.
   if env.user.nil? && email != ""
-    if !get_users(env.db, "email = ?", email).size
-      # The email isn't claimed yet, so let them register it.
-      env.user = register_email env.db, email.not_nil!
-      if env.params.json["sub_site"]?
-        env.user.not_nil!.sub_site = true
-        add_user env.db, env.user.not_nil!
-      end
-    else
+    if get_users(env.db, "email = ?", email).size > 0
       raise UserErr.new 400, "That email belongs to a registered user. " +
                              "If it's you and you just claimed it, check your inbox for a registration link."
+    end
+    env.user = register_email env.db, email.not_nil!
+    if env.params.json["sub_site"]?
+      env.user.not_nil!.sub_site = true
+      change_user env.db, env.user.not_nil!
     end
   end
   cmt.user_id = env.user.try &.id
@@ -103,10 +103,10 @@ def send_reply_notifs(db, new_comment : Comment)
   comment = new_comment
   loop do
     get_comment_subs(db, comment.id).each do |email, sub|
-        # If it's a sub and not overridden by a more specific ignore.
-        listening.add(email) if sub && !ignoring.includes?(email)
-        # if it's an ignore and not overridden by a more specific sub.
-        ignoring.add(email) if !sub && !listening.includes?(email)
+      # If it's a sub and not overridden by a more specific ignore.
+      listening.add(email) if sub && !ignoring.includes?(email)
+      # if it's an ignore and not overridden by a more specific sub.
+      ignoring.add(email) if !sub && !listening.includes?(email)
     end
     # If we're not at the top level, go on with the parent.
     if !comment.reply_to.nil?

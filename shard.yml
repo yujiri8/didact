@@ -7,7 +7,7 @@ authors:
 dependencies:
   sqlite3:
     github: crystal-lang/crystal-sqlite3
-    # branch: master
+    branch: master
   kemal:
     github: kemalcr/kemal
   sanemark:

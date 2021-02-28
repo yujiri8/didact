@@ -3,7 +3,6 @@
 require "sanemark"
 require "option_parser"
 require "ecr"
-
 require "../cfg"
 require "./templates"
 

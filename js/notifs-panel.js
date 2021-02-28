@@ -31,7 +31,8 @@ customElements.define('notifs-panel', class extends LitElement {
 		this.email = util.readCookie('email');
 		this.name = util.readCookie('name');
 		this.key = util.readCookie('key');
-		this.subs = [];
+		this.commentSubs = [];
+		this.articleSubs = [];
 		if (!util.readCookie('auth')) {
 			this.setAttribute('hidden', 'true');
 			return addEventListener('load', async () => {
@@ -164,7 +165,7 @@ customElements.define('notifs-panel', class extends LitElement {
 		this.fetchData();
 	}
 	async delArticleSub(path) {
-		await util.api('PUT', 'users/notifs', undefined, {path: path, state: null});
+		await util.api('PUT', 'users/notifs', undefined, {path: path, state: false});
 		this.fetchData();
 	}
 });

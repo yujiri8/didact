@@ -25,12 +25,9 @@ export async function api(method, url, query, body) {
 	} else if (!resp.ok) {
 		throw handleErr(resp);
 	}
-	try {
+	if (resp.headers.get('Content-Type') === 'application/json' && resp.headers.get('Content-Length') > 0)
 		return await resp.json();
-	} catch (err) {
-		// Not everything returns a body, so just return nothing if it isn't parseable.
-		return;
-	}
+	return await resp.text();
 }
 
 // A helper for api.

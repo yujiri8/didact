@@ -9,6 +9,7 @@ require "./users"
 require "./emails"
 
 db = DB.open "sqlite3://#{CFG.db}"
+db.exec "PRAGMA foreign_keys = on"
 
 class HTTP::Server::Context
   property user : User?

@@ -1,7 +1,7 @@
 #!/usr/bin/env crystal
 
-require "../cfg"
 require "ecr"
+require "../cfg"
 
 # On Linux, Nginx config is under /etc. On FreeBSD, user-installed stuff is prefixed with /usr/local.
 prefix = File.exists?("/usr/local/etc/nginx") ? "/usr/local" : ""

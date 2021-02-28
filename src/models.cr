@@ -1,19 +1,23 @@
 class Comment
-  property id : Int64
-  property name : String
-  property body : String
-  property article_path : String
-  property article_title : String
-  property ip : String?
-  property ua : String?
-  property time_added : Time
-  property time_changed : Time?
-  property reply_to : Int64?
-  property user_id : Int64?
+  DB.mapping({
+    id:            Int64,
+    name:          String,
+    body:          String,
+    article_path:  String,
+    article_title: String,
+    ip:            String?,
+    ua:            String?,
+    time_added:    Time,
+    time_changed:  Time?,
+    reply_to:      Int64?,
+    user_id:       Int64?,
+  })
   alias CommentJson = Int64 | String | Bool | Time | Nil | Array(Hash(String, CommentJson))
+
   def initialize(@name, @body, @article_path, @article_title, @ip,
-      @ua, @time_added, @time_changed = nil, @reply_to = nil, @user_id = nil, @id = 0.to_i64)
+                 @ua, @time_added, @time_changed = nil, @reply_to = nil, @user_id = nil, @id = 0.to_i64)
   end
+
   def dict(db, user_id = nil, raw = false, recursion = 5) : Hash(String, CommentJson)
     cmt = {
       "id"           => @id,
@@ -55,16 +59,19 @@ class Comment
 end
 
 class User
-  property id : Int64
-  property email : String
-  property auth : String
-  property name : String?
-  property pw : String?
-  property disable_reset : Bool
-  property admin : Bool
-  property autosub : Bool
-  property sub_site : Bool
+  DB.mapping({
+    id:            Int64,
+    email:         String,
+    auth:          String,
+    name:          String?,
+    pw:            String?,
+    disable_reset: Bool,
+    admin:         Bool,
+    autosub:       Bool,
+    sub_site:      Bool,
+  })
+
   def initialize(@email, @auth, @name = nil, @pw = nil, @disable_reset = false,
-      @admin = false, @autosub = false, @sub_site = false, @id = 0.to_i64)
+                 @admin = false, @autosub = false, @sub_site = false, @id = 0.to_i64)
   end
 end

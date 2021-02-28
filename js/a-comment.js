@@ -161,7 +161,7 @@ customElements.define('a-comment', class extends LitElement {
 		this.comment = (await util.api('GET', 'comments', {id: this.comment.id})).comments[0];
 	}
 	async delete() {
-		await util.api('DELETE', 'comments', undefined, this.comment.id);
+		await util.api('DELETE', `comments/${this.comment.id}`);
 		this.remove();
 	}
 });

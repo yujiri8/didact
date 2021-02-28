@@ -103,12 +103,7 @@ customElements.define('comment-submit-area', class extends LitElement {
 	}
 	async preview() {
 		this.savedContents = this.shadowRoot.getElementById('body').value;
-		const resp = await util.api('POST', 'comments/preview', undefined, this.savedContents);
-		try {
-			this.previewHTML = await resp.text();
-		} catch (err) {
-			return util.showToast('err', "Couldn't read response from server");
-		}
+		this.previewHTML = await util.api('POST', 'comments/preview', undefined, this.savedContents);
 	}
 	async unpreview() {
 		this.previewHTML = '';

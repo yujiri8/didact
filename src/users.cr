@@ -51,7 +51,7 @@ def register_email(db, email : String)
     return user
   end
   # The email doesn't already exist. They're making a new account.
-  user = User.new(email: email, auth: gen_auth_token())
+  user = User.new(email: email, auth: gen_auth_token(), autosub: true)
   add_user db, user
   send_confirm_email(user)
   user

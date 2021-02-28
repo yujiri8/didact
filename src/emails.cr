@@ -13,7 +13,7 @@ module Emails
       status = sendmail.wait
       raise "Failed to send mail: #{status.inspect}" if !status.success?
     else
-      # If we couldn't send the email, at least log something.
+      # If we couldn't send the email and we aren't allowed to wait, at least log something.
       spawn do
         status = sendmail.wait
         puts "sendmail failed: #{status.inspect}" if !status.success?
