@@ -18,7 +18,7 @@ Didact's philosophy is explained [here](https://yujiri.xyz/didact).
 	* [entr](https://entrproject.org), a command-line tool used by Didact's `monitor.sh` script to automatically update files
 	* `find`, another command-line tool used by `monitor.sh`. May be preinstalled, but if not, the package for it is probably called "findutils".
 
-	Nginx and OpenSMTPD need to be set to start at boot time with your system's service manager (and then started).
+	Nginx and OpenSMTPD need to be set to start at boot time with your system's service manager (and then started (but don't start Nginx until after step 7)).
 
 4. Copy the example content from `example/` to `content/`. (This should be done before the next step because at least a `global.css` is required to be in the `content/` folder.)
 
@@ -81,6 +81,6 @@ Note that the "Be notified when new articles are posted" setting for your users 
 
 ## Advanced instructions
 
-To rebuild faster after a change, you can run individual commands out of `build.sh` to rebuild only the components that need it instead of the whole thing. In particular, the server needs a rebuild after changing email templates, the templater needs a rebuild after changing content templates, and the Javascript needs a rebuild after changing `global.css`. (It also helps to build Crystal stuff without the `--release` flag. That flag turns on optimizations that make it take significantly longer to build.)
+To rebuild faster after a change, you can run individual commands out of `build.sh` to rebuild only the components that need it instead of the whole thing. The server needs a rebuild after changing email templates, the templater needs a rebuild after changing content templates, and the Javascript needs a rebuild after changing `global.css`. (It also helps to build Crystal stuff without the `--release` flag if it's a test build. That flag turns on optimizations that make it take significantly longer to build.)
 
 Run `crystal docs` from the repository root to fill the `docs` folder with HTML documentation on the Crystal code.
