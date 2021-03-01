@@ -39,6 +39,8 @@ Didact's philosophy is explained [here](https://yujiri.xyz/didact).
 
 	Nginx will need read access to `html/`. If you don't want to give it read access to your home folder, you can achieve this by making a symlink to `html/` in a place that Nginx can read.
 
+The test script `tests/test.sh` performs the required steps on a new FreeBSD server and may be a useful guide if the above instructions are unclear.
+
 ## Adding content
 
 Content goes in `content/`. The template script, `didact-template`, will read this folder and populate `html/` with the actual files to be served to browsers. Any content file that doesn't end in `.md` or `.html` (images, downloads, etc), is assumed to be a static file, and will be hard-linked directly to the deploy folder. Files that do end in `.md` or `.html` are your main text context.

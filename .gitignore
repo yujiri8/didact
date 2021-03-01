@@ -9,3 +9,4 @@ didact-template
 src/scripts/templates.cr
 js/css.js
 didact.yml
+didact.sqlite
