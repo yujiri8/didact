@@ -30,7 +30,7 @@ export async function api(method, url, query, body) {
 	} else if (!resp.ok) {
 		throw handleErr(resp);
 	}
-	if (resp.headers.get('Content-Type') === 'application/json' && resp.headers.get('Content-Length') > 0)
+	if (resp.headers.get('Content-Type') === 'application/json' && !(resp.headers.get('Content-Length') == 0))
 		return await resp.json();
 	return await resp.text();
 }
