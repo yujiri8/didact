@@ -5,8 +5,13 @@ import {unsafeHTML} from 'lit-html/directives/unsafe-html.js';
 export async function api(method, url, query, body) {
 	if (typeof body == 'object') body = JSON.stringify(body);
 	if (query) {
-		let qs = Object.entries(query).map(fmtQueryParam).join('&');
-		if (qs.length) url = url + "?" + qs;
+		const params = new URLSearchParams();
+		for (const param in query) {
+			if (query[param] instanceof Array)
+				for (const val of query[param]) params.append(param, val);
+			else if (query[param] != null) params.append(param, query[param]);
+		}
+		url += `?${params.toString()}`;
 	}
 	try {
 		var resp = await fetch('/api/' + url, {body: body, method: method,
@@ -30,21 +35,12 @@ export async function api(method, url, query, body) {
 	return await resp.text();
 }
 
-// A helper for api.
-function fmtQueryParam(entry) {
-	const k = entry[0];
-	const v = entry[1];
-	if (v instanceof Array)
-		return v.map(i => encodeURIComponent(k) + '=' + encodeURIComponent(i)).join('&');
-	return encodeURIComponent(k) + '=' + encodeURIComponent(v);
-}
-
 const errorCodes = {
 	400: "Bad request",
 	401: "Not logged in?",
 	403: "You don't have permission to do that.",
 	404: "Not found",
-	500: "Server error. I should receive an automatic email about this, so with luck I'll fix it soon.",
+	500: "Server error. I should receive an automatic email about this, so I'll probably fix it soon.",
 	502: "Seems like the server isn't running. Hopefully I'll fix this ASAP.",
 }
 
@@ -143,15 +139,10 @@ export function showToast(tone, msg) {
 	toast.show(msg);
 }
 
-// Adapted from code by jsdw from Stack Overflow. Pass location.search.
-export function parseQuery(raw) {
-	raw = raw.slice(1); // Drop the initial ?.
-	const entries = raw.split("&");
+// parse a query string into an object with duplicate keys represented as arrays.
+export function parseQuery(queryString) {
 	const query = {};
-	for (let entry of entries) {
-		const pieces = entry.split("=");
-		const param = decodeURIComponent(pieces[0]);
-		const value = decodeURIComponent(pieces[1]);
+	for (const [param, value] of new URLSearchParams(queryString).entries())
 		if (query[param] == undefined) {
 			query[param] = value;
 		} else if (query[param] instanceof Array) {
@@ -159,7 +150,6 @@ export function parseQuery(raw) {
 		} else {
 			query[param] = [query[param], value];
 		}
-	}
 	return query;
 }
 
