@@ -20,4 +20,9 @@ module Util
       return line.lchop("TITLE ") if line.starts_with? "TITLE "
     end
   end
+
+  def require_admin(env)
+    raise UserErr.new(401) if !env.user
+    raise UserErr.new(403) if !env.user.not_nil!.admin
+  end
 end

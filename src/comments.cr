@@ -89,8 +89,7 @@ put "/comments" do |env|
 end
 
 delete "/comments/:id" do |env|
-  halt env, status_code: 401 if !env.user
-  halt env, status_code: 403 if !env.user.not_nil!.admin
+  Util.require_admin env
   env.db.exec("DELETE FROM comments WHERE id = ?", env.params.url["id"].to_i)
 end
 
