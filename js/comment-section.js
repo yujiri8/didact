@@ -34,7 +34,7 @@ customElements.define('comment-section', class extends LitElement {
 		<h1>Comments</h1>
 		<p>
 		You can post without an account; if you provide an email, an account will be created and a confirmation email
-		sent. Accounts provide reply notifications, and, with a PGP key uploaded, the ability to edit your comments.
+		sent. Accounts provide reply notifications and the ability to edit your comments.
 		</p><p>
 		Formatting with <a href="https://yujiri.xyz/sanemark">Sanemark</a>, a version of Markdown, is supported.
 		</p><p>
