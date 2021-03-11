@@ -75,6 +75,8 @@ The included `monitor.sh` is meant to run in the background. It monitors `conten
 
 Due to a technical limitation, the CSS needs to be duplicated between `content/global.css` and `js/css.js`. There is a pre-build script that handles this, called by `build.sh`, so you don't need to worry about it unless you change `global.css`.
 
+Files in your content folder that start with `.` or `_` will not be written to `html/` unless named explicitly on the command line.
+
 ## Email setup
 
 By default, most mail servers will either reject your mail or show it with some sort of "couldn't verify sender" warning (very likely to be sent to spam). You need to prove to the server that your email is coming from the address it says it is. The simplest way is to [set up an SPF DNS record for your domain](https://www.dmarcanalyzer.com/spf/how-to-create-an-spf-txt-record/).

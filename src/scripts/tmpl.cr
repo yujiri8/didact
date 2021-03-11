@@ -16,7 +16,7 @@ def process_file(filename)
   # If it's a directory, create it in the deployment dir if it doesn't exist, then recurse into it.
   if File.directory? infile
     Dir.mkdir outfile if !File.exists? outfile
-    Dir.children(infile).each { |child| process_file (File.join [infile, child]) }
+    Dir.children(infile).each { |child| process_file (File.join [infile, child]) unless should_skip child }
     return
   end
   puts "#{infile} -> #{outfile}"
@@ -91,6 +91,11 @@ def navbar_html(path : String, nav : String | Nil, title : String)
     navhtml += " &gt; <a style=\"color:yellow\" href=\"#{running_path}/\">#{name}</a>"
   end
   navhtml + " &gt; " + (nav || title)
+end
+
+# Determines whether a file should be skipped if found as a child of a folder rather than named explicitly.
+def should_skip(file)
+	file.starts_with?(".") || file.starts_with?("_")
 end
 
 OptionParser.parse do |parser|
