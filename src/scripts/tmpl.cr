@@ -43,7 +43,7 @@ def build_article(file)
   args = parse_directives(header)
   raise "The TITLE directive is required." if !args["TITLE"]?
   args["TIMESTAMP"] = Time.utc
-  args["PATH"] = Path.new(file).relative_to(CONTENT_DIR).to_s.chomp(".html").chomp(".md")
+  args["PATH"] = Path.new(file).relative_to(CONTENT_DIR).to_s.chomp(".html").chomp(".md").chomp("index")
   args["NAV"] = navbar_html(args["PATH"].as(String), args["NAV"]?.try &.as(String), args["TITLE"].as(String))
   args["BODY"] = file.ends_with?(".md") ? Sanemark.to_html(body, Sanemark::Options.new(allow_html: true)) : body
   TEMPLATES[args["TEMPLATE"]? || "default"].call args
