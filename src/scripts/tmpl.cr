@@ -68,8 +68,8 @@ end
 # Computes the HTML for the navbar from the path of the page and the NAV setting.
 # Note that `path` should not include the leading slash.
 def navbar_html(path : String, nav : String | Nil, title : String)
-  return CFG.site_title if path == "index"
-  path = path.chomp("/index")
+  return CFG.site_title if path == ""
+  path = path.chomp("/")
   navhtml = "<a style=\"color:yellow\" href=\"/\">#{CFG.site_title}</a>"
   running_path = "/"
   path.split("/")[..-2].each do |piece|
