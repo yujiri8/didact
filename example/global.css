@@ -35,6 +35,9 @@ article {
 	margin: var(--outer-margins);
 	margin-top: calc(var(--outer-margins) + 1em);
 }
+article p {
+	white-space: pre-line;
+}
 
 .navbar {
 	position: sticky;

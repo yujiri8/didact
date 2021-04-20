@@ -42,6 +42,9 @@ customElements.define('a-comment', class extends LitElement {
 			padding: 0.5em;
 			overflow-x: auto;
 		}
+		.body p {
+			white-space: pre-line;
+		}
 		hr {
 			margin-top: 0;
 			margin-bottom: 0;
