@@ -33,9 +33,11 @@ Didact's philosophy is explained [here](https://yujiri.xyz/didact).
 
 7. Install configurations for dependencies by running `src/scripts/install.cr`.
 
-8. Run `src/scripts/createdb.cr` to create the database.
+8. Install your TLS certificates in `/etc/letsencrypt/live/yourdomain`. The generated Nginx config expects to find them there.
 
-9. Your content goes in `content/` (see [Adding content](#adding-content)). The folder is not tracked by git, and the recommended way to use Didact is to store your content in its own repository that you put there.
+9. Run `src/scripts/createdb.cr` to create the database.
+
+10. Your content goes in `content/` (see [Adding content](#adding-content)). The folder is not tracked by git, and the recommended way to use Didact is to store your content in its own repository that you put there.
 
 	Nginx will need read access to `html/`. If you don't want to give it read access to your home folder, you can achieve this by making a symlink to `html/` in a place that Nginx can read.
 
