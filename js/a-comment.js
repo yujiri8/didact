@@ -139,7 +139,7 @@ customElements.define('a-comment', class extends LitElement {
 			`}
 		`:''}
 		${this.admin? html`
-			<button @click="${this.delete}">Delete</button>
+			<button @click="${this.del}">Delete</button>
 		`:''}
 		`;
 	}
@@ -163,7 +163,7 @@ customElements.define('a-comment', class extends LitElement {
 		// Re-fetch it.
 		this.comment = (await util.api('GET', 'comments', {id: this.comment.id})).comments[0];
 	}
-	async delete() {
+	async del() {
 		await util.api('DELETE', `comments/${this.comment.id}`);
 		this.remove();
 	}
