@@ -3,7 +3,7 @@
 	--outer-margins: 1em;
 	--bgcolor: #080808;
 	--textcolor: white;
-	--weakcolor: grey;
+	--weakcolor: grey; /* used for borders and shadows */
 	--buttonbgcolor: #ddd;
 	--tintcolor: #282828;
 	--linkcolor: #07f;
@@ -15,7 +15,7 @@
 :root[data-theme="light"] {
 	--bgcolor: white;
 	--textcolor: black;
-	--weakcolor: grey; /* used for borders and shadows */
+	--weakcolor: grey;
 	--buttonbgcolor: #eee;
 	--tintcolor: #eee;
 	--linkcolor: #00e;
