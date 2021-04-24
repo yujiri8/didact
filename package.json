@@ -18,7 +18,6 @@
   "dependencies": {
     "@material/mwc-dialog": "0.20.0",
     "@material/mwc-snackbar": "0.20.0",
-    "@material/mwc-switch": "0.20.0",
     "lit-element": "^2.3.1",
     "lit-html": "^1.2.1",
     "lit-toast": "^1.5.1"

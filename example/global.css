@@ -1,18 +1,6 @@
 /* color scheme */
 :root {
 	--outer-margins: 1em;
-	--bgcolor: white;
-	--textcolor: black;
-	--weakcolor: grey; /* used for borders and shadows */
-	--buttonbgcolor: #eee;
-	--tintcolor: #eee;
-	--linkcolor: #00e;
-	--linkvisitedcolor: #50a;
-	--yellowcolor: #aa0; /* yellow needs to be darker on a white background to look good */
-	--notecolor: #090;
-}
-/* color changes for dark mode */
-:root[data-theme="dark"] {
 	--bgcolor: #080808;
 	--textcolor: white;
 	--weakcolor: grey;
@@ -22,6 +10,18 @@
 	--linkvisitedcolor: #b0f;
 	--yellowcolor: #ff0;
 	--notecolor: #9f9;
+}
+/* color changes for light mode */
+:root[data-theme="light"] {
+	--bgcolor: white;
+	--textcolor: black;
+	--weakcolor: grey; /* used for borders and shadows */
+	--buttonbgcolor: #eee;
+	--tintcolor: #eee;
+	--linkcolor: #00e;
+	--linkvisitedcolor: #50a;
+	--yellowcolor: #aa0; /* yellow needs to be darker on a white background to look good */
+	--notecolor: #090;
 }
 
 body {
@@ -128,7 +128,7 @@ h1 {
 	margin-block-end: 0.67em;
 }
 
-input, textarea {
+input:not([type="checkbox"]), textarea {
 	color: var(--textcolor);
 	background-color: var(--bgcolor);
 	border: 1px solid var(--weakcolor);
@@ -136,7 +136,7 @@ input, textarea {
 	margin-bottom: 1em;
 }
 /* these don't inherit font stuff by default */
-input, textarea, button {
+input:not([type="checkbox"]), textarea, button {
 	font-family: inherit;
 	font-size: 0.9em;
 }
