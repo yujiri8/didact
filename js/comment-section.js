@@ -43,8 +43,8 @@ customElements.define('comment-section', class extends LitElement {
 		<login-pane></login-pane>
 		<br>
 		${this.loggedIn? html`
-			<label for="sub-post">Be notified of new top-level comments on this page</label>
 			<input id="sub-post" type="checkbox" ?checked="${this.subscribed}" @change="${this.toggleSubscribe}">
+			<label for="sub-post">Be notified of new top-level comments on this page</label>
 		`:''}
 		<comment-submit-area open ?logged-in="${this.loggedIn}" reply-to="${location.pathname}">
 		</comment-submit-area>
