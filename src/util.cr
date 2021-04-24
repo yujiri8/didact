@@ -4,7 +4,7 @@ module Util
   extend self
 
   def markdown(text : String, allow_html = false)
-    Sanemark.to_html(text, Sanemark::Options.new(allow_html: allow_html))
+    Sanemark.to_html(text, Sanemark::Options.new(allow_html: allow_html, spoilers: true))
   end
 
   # Gets the title of an article from its path.
