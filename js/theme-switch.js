@@ -12,7 +12,7 @@ customElements.define('theme-switch', class extends LitElement {
 			align-items: center;
 		}
 		label {
-			margin-bottom: 0.2em;
+			text-align: center;
 		}
 		`];
 	}
