@@ -19,8 +19,8 @@ customElements.define('auth-popup', class extends LitElement {
 		:host([hidden]) { display: none; }
 		:host {	display: block; }
 		input { /* The popup looks better as black-on-white even in dark mode. */
-			color: initial;
-			background-color: initial;
+			color: initial !important;
+			background-color: initial !important;
 		}
 		`];
 	}
