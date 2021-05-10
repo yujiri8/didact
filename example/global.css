@@ -71,9 +71,13 @@ code, pre {
 code {
 	background-color: var(--tintcolor);
 	white-space: pre-wrap;
-	word-break: break-word;
+	overflow-wrap: break-word;
 }
-pre > code { display: block }
+pre > code {
+	display: block;
+	white-space: pre;
+	overflow-x: auto;
+}
 .highlight { background-color: #ff06 }
 .note:before { content: '[' }
 .note:after { content: ']' }
