@@ -30,6 +30,9 @@ customElements.define('comment-submit-area', class extends LitElement {
 			border: 1px solid var(--weakcolor);
 			padding: 2px;
 		}
+		#preview p {
+			white-space: pre-line;
+		}
 		`];
 	}
 	connectedCallback() {
