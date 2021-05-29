@@ -6,6 +6,7 @@ content
 html
 didact-server
 didact-template
+email-subscribers
 src/scripts/templates.cr
 js/css.js
 didact.yml
