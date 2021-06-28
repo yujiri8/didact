@@ -37,28 +37,33 @@ customElements.define('spem-search', class extends LitElement {
 			<div style="flex:1; min-width:18em">
 				<div style="display:flex; flex-wrap:wrap">
 					<div>
-						<label for="word">Word</label>
-						<input id="word" type="text" autocapitalize="off">
-						<br>
-						<label for="meaning">Meaning</label>
-						<input id="meaning" type="text" autocapitalize="off">
-						<br>
-						<label for="translation">Translation</label>
-						<input id="translation" type="text" autocapitalize="off">
-						<br>
-						<label for="notes">Notes</label>
-						<input id="notes" type="text" autocapitalize="off">
-						<br>
+						<div title="Enter multiple space-separated words to find them all.">
+							<label for="word">Spem Word</label>
+							<input id="word" type="text" autocapitalize="off" @keydown="${this.searchOnEnter}">
+						</div>
+						<div title="Searches for Spem words needed to express the equivalent, even if the translation isn't direct. This means the parts of speech won't always match.">
+							<label for="translation">Translation</label>
+							<input id="translation" type="text" autocapitalize="off" @keydown="${this.searchOnEnter}">
+						</div>
+						<div title="Search for words with a given string in the Notes field. Case-insensitive.">
+							<label for="notes">Notes</label>
+							<input id="notes" type="text" autocapitalize="off" @keydown="${this.searchOnEnter}">
+						</div>
 						<label for="notes-regex">Notes (PCRE)</label>
-						<input id="notes-regex" type="text" autocapitalize="off">
+						<input id="notes-regex" type="text" autocapitalize="off" @keydown="${this.searchOnEnter}">
 					</div>
 					<div>
 						<label for="tags">Tags</label>
-						<input-list id="tags" class="indent" type="select" .options="${this.tags}"></input-list>
+						<input-list id="tags" class="indent" type="select" .options="${this.tags}"
+								@keydown="${this.searchOnEnter}">
+						</input-list>
 					</div>
 				</div>
 				<br>
 				<button @click="${this.search}">Search</button>
+				<p>
+				Pressing Enter while typing in a text field or Esc will submit the search.
+				</p>
 			</div>
 			${this.admin? html`
 				<fieldset style="flex:1; min-width:18em">
@@ -68,11 +73,11 @@ customElements.define('spem-search', class extends LitElement {
 							<label for="admin-word">θɑr</label>
 							<input id="admin-word" type="text" autocapitalize="off">
 							<br>
-							<label for="admin-meaning">kel ɪl θen nɑ</label>
+							<label for="admin-meaning">kel nɑy θen nɑ</label>
 							<input id="admin-meaning" type="text" autocapitalize="off">
 						</div>
 						<div>
-							<label for="admin-translations">kel nɑi θetsu ɪl av</label>
+							<label for="admin-translations">kel θetsu nɑy av nɑ</label>
 							<input-list id="admin-translations" class="indent"></input-list>
 						</div>
 						<div>
@@ -88,30 +93,6 @@ customElements.define('spem-search', class extends LitElement {
 				</fieldset>
 			`:''}
 		</div>
-		<p>
-		The Translation box expects an exact English word and will try to find the Spem words
-		needed to express the equivalent, even if the translation isn't direct. (Note that this
-		means the parts of speech won't match sometimes.) The Meaning box searches an English
-		phrase that describes the word's meaning and the query doesn't have to match exactly.
-		</p><p>
-		So for example if you want to find all the words that could be translated as
-		'of', search for that in the Translation box. If you search for that in the Meaning
-		box, you might get a word that means "the opposite of".
-		</p><p>
-		On the other hand, if you remember the distinction Spem makes between the different meanings
-		of English 'of' but not what the words for them are, you could search in the Meaning
-		box for "association of" and you'd get <i>ŋe</i> at the top.
-		(<i>ŋe</i> wouldn't come up for a Translation search for "of (assocation)" because
-		it would never be translated as that.)
-		</p><p>
-		The Tags widget allows filtering by categories, and Notes lets you enter
-		a string that must be found in the notes field (searches case-insensitively).
-		</p><p>
-		The Word box is unique in that if you enter multiple space-separated words, it will look for all of
-		them instead of treating it as one word.
-		</p><p>
-		For convenience, either Enter while typing in a text field or Esc will submit the search.
-		</p>
 		<p id="result-count"></p>
 		<div style="overflow-x:auto">
 		<table>
@@ -148,19 +129,25 @@ customElements.define('spem-search', class extends LitElement {
 		</p>
 		`;
 	}
-	async firstUpdated() {
-		super.firstUpdated();
-		this.bindSearchKeys();
+	async connectedCallback() {
+		super.connectedCallback();
+		// Esc anywhere should search.
+		addEventListener('keyup', e => {
+			if (e.key === 'Escape') this.search();
+		});
 		this.tags = await util.api('GET', 'spem/tags');
-		await this.updateComplete;
-		const args = util.parseQuery(location.search);
-		const params = ['word', 'meaning', 'translation', 'tag', 'notes', 'notes_regex'];
-		if (params.some(p => p in args)) this.pageloadSearch();
+	}
+	searchOnEnter(e) {
+		if (e.key === 'Enter') this.search();
+	}
+	async firstUpdated() {
+		this.pageloadSearch();
 	}
 	async pageloadSearch() {
 		const args = util.parseQuery(location.search);
+		const possibleArgs = ['word', 'translation', 'tag', 'notes', 'notes_regex'];
+		if (!possibleArgs.some(p => p in args)) return;
 		this.shadowRoot.getElementById('word').value = args.word || '';
-		this.shadowRoot.getElementById('meaning').value = args.meaning || '';
 		this.shadowRoot.getElementById('translation').value = args.translation || '';
 		this.shadowRoot.getElementById('notes').value = args.notes || '';
 		this.shadowRoot.getElementById('notes-regex').value = args.notes_regex || '';
@@ -168,30 +155,10 @@ customElements.define('spem-search', class extends LitElement {
 			args.tag? (args.tag instanceof Array? args.tag : [args.tag]) : []);
 		this.search();
 	}
-	bindSearchKeys() {
-		// Enter on any of these elements should search.
-		const targets = [
-			this.shadowRoot.getElementById('word'),
-			this.shadowRoot.getElementById('meaning'),
-			this.shadowRoot.getElementById('translation'),
-			this.shadowRoot.getElementById('tags'),
-			this.shadowRoot.getElementById('notes'),
-			this.shadowRoot.getElementById('notes-regex'),
-		];
-		for (let elem of targets)
-			elem.addEventListener('keyup', e => {
-				if (e.key === 'Enter') this.search();
-			});
-		// Esc anywhere should search.
-		addEventListener('keyup', e => {
-			if (e.key === 'Escape') this.search();
-		});
-	}
 	async search() {
 		// Gather data.
 		const query = {
 			word: this.shadowRoot.getElementById('word').value || undefined,
-			meaning: this.shadowRoot.getElementById('meaning').value || undefined,
 			translation: this.shadowRoot.getElementById('translation').value || undefined,
 			notes: this.shadowRoot.getElementById('notes').value || undefined,
 			notes_regex: this.shadowRoot.getElementById('notes-regex').value || undefined,

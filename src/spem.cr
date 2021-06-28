@@ -1,7 +1,6 @@
 get "/spem/words" do |env|
   begin
     name = env.params.query["word"]?
-    meaning = env.params.query["meaning"]? || ""
     notes = env.params.query["notes"]?
     notes_regex = env.params.query["notes_regex"]?
     raw = !env.params.query["raw"]?.nil?
@@ -17,10 +16,6 @@ get "/spem/words" do |env|
     names = name.split(/ /, remove_empty: true)
     where << "name IN (#{(names.map { |_| "?" }).join(",")})"
     args.concat names
-  end
-  meaning.split(/ /, remove_empty: true).each do |token|
-    where << "meaning REGEXP ?"
-    args << "\\b#{Regex.escape(token)}\\b"
   end
   if notes
     where << "notes REGEXP ?"
