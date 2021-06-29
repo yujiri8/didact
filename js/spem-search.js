@@ -34,8 +34,8 @@ customElements.define('spem-search', class extends LitElement {
 	render() {
 		return html`
 		<div style="display:flex; flex-wrap:wrap">
-			<div style="flex:1; min-width:18em">
-				<div style="display:flex; flex-wrap:wrap">
+			<div style="flex:1; margin-right:1em">
+				<div style="display:flex; flex-wrap:wrap; white-space:nowrap">
 					<div>
 						<div title="Enter multiple space-separated words to find them all.">
 							<label for="word">Spem Word</label>
@@ -49,8 +49,10 @@ customElements.define('spem-search', class extends LitElement {
 							<label for="notes">Notes</label>
 							<input id="notes" type="text" autocapitalize="off" @keydown="${this.searchOnEnter}">
 						</div>
-						<label for="notes-regex">Notes (PCRE)</label>
-						<input id="notes-regex" type="text" autocapitalize="off" @keydown="${this.searchOnEnter}">
+						<div>
+							<label for="notes-regex">Notes (PCRE)</label>
+							<input id="notes-regex" type="text" autocapitalize="off" @keydown="${this.searchOnEnter}">
+						</div>
 					</div>
 					<div>
 						<label for="tags">Tags</label>
@@ -66,15 +68,18 @@ customElements.define('spem-search', class extends LitElement {
 				</p>
 			</div>
 			${this.admin? html`
-				<fieldset style="flex:1; min-width:18em">
+				<fieldset style="flex:1">
 					<legend>Admin</legend>
-					<div style="display:flex; flex-wrap:wrap">
+					<div style="display:flex; flex-wrap:wrap; white-space:nowrap">
 						<div>
-							<label for="admin-word">θɑr</label>
-							<input id="admin-word" type="text" autocapitalize="off">
-							<br>
-							<label for="admin-meaning">kel nɑy θen nɑ</label>
-							<input id="admin-meaning" type="text" autocapitalize="off">
+							<div>
+								<label for="admin-word">θɑr</label>
+								<input id="admin-word" type="text" autocapitalize="off">
+							</div>
+							<div>
+								<label for="admin-meaning">kel nɑy θen nɑ</label>
+								<input id="admin-meaning" type="text" autocapitalize="off">
+							</div>
 						</div>
 						<div>
 							<label for="admin-translations">kel θetsu nɑy av nɑ</label>
